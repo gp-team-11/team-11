@@ -1,29 +1,28 @@
 <html>
 <head>
 <title>테스트1</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <link rel="stylesheet" type="text/css" href="index.css" />
 </head>
 <body>
 <div class="grid">
     <div class="left-column">
         <canvas id="board" class="game-board"></canvas>
-        <div class="btn_group">
+        <div class="btn-group">
             <button id="btn_select" onclick="btn_select(0)" class="button">1</button><!--
             --><button id="btn_select" onclick="btn_select(1)" class="button">2</button><!--
             --><button id="btn_select" onclick="btn_select(2)" class="button">3</button>
         </div>
     </div>
     <div class="right-column">
-        <p>임시 디자인</p>
-        <canvas id="next"></canvas>
-        <p>Score: <span id="score">0</span></p>
+        <p id="p_title">임시 디자인</p>
+        <p id="p_next"></p>
+        <p id="p_score">Score: <span id="score">0</span></p>
         <button id="btn_pause" onclick="btn_pause()" class="button">Pause</button>
         <button id="btn_down" onclick="btn_down()" class="button">Down</button>
     </div>
 </div>
-
-
 <script type="text/javascript" src="constants.js"></script>
 <script type="text/javascript" src="board.js"></script>
 <script type="text/javascript" src="piece.js"></script>

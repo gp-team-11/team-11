@@ -26,7 +26,7 @@ let account = new Proxy(accountValues, {
     }
 });
 
-// 이벤트 리스터 설정
+// 이벤트 리스너 설정
 function addEventListener() {
     document.removeEventListener('keydown', handleKeyPress);
     document.addEventListener('keydown', handleKeyPress);
@@ -34,6 +34,9 @@ function addEventListener() {
 
 // 버튼 눌렀을 때 이벤트
 function btn_select(col) {
+    if (!requestId) {
+        return;
+    }
     if (board.isSelected()) {
         board.move(col);
     } else {
@@ -42,6 +45,9 @@ function btn_select(col) {
 }
 
 function btn_down() {
+    if (!requestId) {
+        return;
+    }    
     board.down();
 }
 
@@ -53,6 +59,9 @@ function btn_pause() {
 function handleKeyPress(event) {
     if (event.keyCode === KEY.P) {
         pause();
+    }
+    if (!requestId) {
+        return;
     }
     if (event.keyCode === KEY.ESC) {
         // gameOver();
@@ -68,8 +77,7 @@ function handleKeyPress(event) {
     }
     if (event.keyCode == KEY.SPACE) {
         board.down();
-    }
-    
+    } 
 }
 
 // 게임 리셋
@@ -128,6 +136,7 @@ function pause() {
 // 게임 오버
 function gameOver() {
     cancelAnimationFrame(requestId);
+    requestId = null;
     alert("Game Over");
 
     // 스코어 저장 등 이벤트 추가
