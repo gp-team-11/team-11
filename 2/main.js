@@ -4,8 +4,10 @@ const ctx = canvas.getContext('2d');
 let board = new Board(ctx);
 let requestId = null;
 let time = null;
+let pausedTime = 0;
 
 let accountValues = {
+    timelimit: 0,
     score: 0,
     exp: 0,
     level: 0
@@ -26,30 +28,25 @@ let account = new Proxy(accountValues, {
     }
 });
 
-// 이벤트 리스터 설정
+// 이벤트 리스너 설정
 function addEventListener() {
     canvas.removeEventListener('click', handleMouseClick);
     canvas.addEventListener('click', handleMouseClick);
 }
 
 function handleMouseClick(event) {
+    // 일시정지일 경우
+    if (!requestId) {
+        return;
+    }
     var r = canvas.getBoundingClientRect();
 
-    var row = Math.floor((event.y - r.top) / ROW_SIZE);
-    var col = Math.floor((event.x - r.left) / COL_SIZE);
+    var row = Math.floor((event.y - r.top - BORDER) * (ROWS / (r.height - BORDER * 2)));
+    var col = Math.floor((event.x - r.left - BORDER) * (COLS / (r.width - BORDER * 2)));
 
     if (!board.click(row, col)) {
         gameOver();
         return
-    }
-}
-
-// 버튼 눌렀을 때 이벤트
-function btn_select(col) {
-    if (board.isSelected()) {
-        board.move(col);
-    } else {
-        board.select(col);
     }
 }
 
@@ -59,7 +56,9 @@ function btn_pause() {
 
 // 게임 리셋
 function resetGame() {
+    account.timelimit = 0;
     account.score = 0;
+    account.exp = 0;
     account.level = 0;
     board.reset();
     time = { start: performance.now(), elapsed: 0, level: LEVEL[account.level] };
@@ -78,29 +77,30 @@ function play() {
 
 // 표현
 function animate(now = 0) {
-    time.elapsed = now - time.start;
-    if (time.elapsed > time.level) {
-        time.start = now;
-        if (!board.inTime()) {
-            gameOver();
-            return;
-        }
+    // 제한 시간
+    account.timelimit = ((board.limit() - Math.floor(performance.now() - pausedTime)) / 1000).toFixed(2);
+    if (account.timelimit <= 0) {
+        account.timelimit = 0;
+        gameOver();
+        return;
     }
   
     // 보드 상태 초기화
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  
     board.draw();
     requestId = requestAnimationFrame(animate);
 }
 
 function pause() {
     if (!requestId) {
+        pausedTime = performance.now() + pausedTime;
         animate();
         document.getElementById("btn_pause").innerHTML = "Pause";
         return;
     }
 
+    pausedTime = pausedTime - performance.now();
+    board.black();
     cancelAnimationFrame(requestId);
     requestId = null;
 
@@ -110,6 +110,7 @@ function pause() {
 // 게임 오버
 function gameOver() {
     cancelAnimationFrame(requestId);
+    requestId = null;
     alert("Game Over");
 
     // 스코어 저장 등 이벤트 추가

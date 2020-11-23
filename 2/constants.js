@@ -2,8 +2,9 @@
 
 const COLS = 3;
 const ROWS = 4;
-const ROW_SIZE = 195;
-const COL_SIZE = 120;
+const ROW_SIZE = 390;
+const COL_SIZE = 240;
+const BORDER = 2;
 
 const MAX_LEVEL = 4;
 
@@ -15,4 +16,4 @@ const LEVEL = {
     4: 100
 };
 
-[LEVEL].forEach(item => Object.freeze(item));
+[LEVEL, LEVEL].forEach(item => Object.freeze(item));

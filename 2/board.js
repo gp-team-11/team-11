@@ -9,7 +9,7 @@ class Board {
 
     // 보드 초기화
     reset() {
-        this.clickedInTime = false;
+        this.timelimit = LEVEL[0];
         this.currentNum = 1;
         this.inTimeNum = 1;
         this.currentGroup = 0;
@@ -26,6 +26,11 @@ class Board {
         }
     }
 
+    // 누적 제한 시간 반환
+    limit() {
+        return this.timelimit;
+    }
+
     // 해당 칸 클릭 시 이벤트
     click(row, col) {
         var value = this.grid[row][col];
@@ -35,12 +40,14 @@ class Board {
             account.score += 1;
             this.currentNum++;
             account.exp++;
-            if (account.exp >= 24) {
+            if (account.exp >= 10) {
                 if (account.level < MAX_LEVEL) {
                     account.level++;
+                    time.level = LEVEL[account.level];
                 }
                 account.exp = 0;
             }
+            this.timelimit += LEVEL[account.level];
 
             // if first click in group
             if (value % 12 == 1) {
@@ -69,29 +76,23 @@ class Board {
                     this.ctx.fillRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
                     this.ctx.fillStyle = '#000000';
                     this.ctx.strokeRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-                    this.ctx.font = "30px Arial";
+                    this.ctx.font = "100px Arial";
                     this.ctx.textAlign = "center";
                     this.ctx.fillText(value, x * COL_SIZE + COL_SIZE / 2, y * ROW_SIZE + ROW_SIZE / 2);
                 }
             });
         });
-
-
     }
 
-    // 블록 드롭
-    inTime() {
-        this.inTimeNum++;
-        //console.log(this.inTimeNum + " " + this.currentNum);
-        //console.log(isNaN(this.inTimeNum) + " " + isNaN(this.currentNum));
-        // 시간안에 특정 숫자까지 도달하지 못했을 경우
-        //alert((this.inTineNum > this.currentNum));
-        //alert(this.inTineNum - this.currentNum);
-        if (this.inTimeNum > this.currentNum) {
-            return false;
-        }
-
-        return true;
+    // 일시정지 시 화면 가리기
+    black() {
+        this.grid.forEach((row, y) => {
+            row.forEach((value, x) => {
+                this.ctx.fillStyle = '#FFFFFF';
+                this.ctx.fillRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
+                this.ctx.fillStyle = '#000000';
+                this.ctx.strokeRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
+            });
+        });
     }
-
 }
