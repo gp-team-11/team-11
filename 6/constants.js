@@ -17,8 +17,7 @@ const COLORS = [
     '#C9BC46', // 노
     '#3CB371', // 초
     '#6B4784', // 보
-    '#A0D468', // 연
-    '#AF7960' // 갈
+    '#A0D468' // 연
 ];
 
 const KEY = {
@@ -38,27 +37,7 @@ const KEY = {
     R: 82
 };
 
-const MOVES = {
-    [KEY.LEFT]: (p) => ({ ...p, x: p.x - 1 }),
-    [KEY.RIGHT]: (p) => ({ ...p, x: p.x + 1 }),
-    [KEY.DOWN]: (p) => ({ ...p, y: p.y + 1 }),
-    [KEY.SPACE]: (p) => ({ ...p, y: p.y + 1 })
-};
-
 const COLORCOUNTS = {
-    0: 2,
-    1: 3,
-    2: 3,
-    3: 4,
-    4: 4,
-    5: 5,
-    6: 5,
-    7: 6,
-    8: 6,
-    9: 7
-};
-
-const BLOCKCOUNTS = {
     0: 2,
     1: 2,
     2: 3,
@@ -71,4 +50,17 @@ const BLOCKCOUNTS = {
     9: 6
 };
 
-[COLORS, MOVES, KEY, COLORCOUNTS, BLOCKCOUNTS].forEach(item => Object.freeze(item));
+const BLOCKCOUNTS = {
+    0: 2,
+    1: 3,
+    2: 4,
+    3: 5,
+    4: 6,
+    5: 7,
+    6: 8,
+    7: 9,
+    8: 10,
+    9: 11
+};
+
+[COLORS, KEY, COLORCOUNTS, BLOCKCOUNTS].forEach(item => Object.freeze(item));

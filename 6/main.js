@@ -96,7 +96,7 @@ function btn_submit() {
             account.score += Math.ceil(account.timelimit);
             account.exp += 1;
 
-            if (account.exp >= 3) {
+            if (account.exp >= 2) {
                 if (account.level < MAX_LEVEL) {
                     account.level++;
                 }
