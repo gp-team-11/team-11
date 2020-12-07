@@ -1,9 +1,13 @@
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
+const canvasExp = document.getElementById('canvasExp');
+const ctxExp = canvasExp.getContext('2d');
+const canvasTime = document.getElementById('canvasTime');
+const ctxTime = canvasTime.getContext('2d');
 
 let board = new Board(ctx);
+let gaugeBar = new GaugeBar(ctxExp, ctxTime);
 let requestId = null;
-let time = null;
 let pausedTime = 0;
 
 let accountValues = {
@@ -16,7 +20,11 @@ let accountValues = {
 function updateAccount(key, value) {
     let element = document.getElementById(key);
     if (element) {
-        element.textContent = value;
+        if (key === 'level' && value === MAX_LEVEL) {
+            element.textContent = 'MAX';
+        } else {
+            element.textContent = value;
+        }
     }
 }
 
@@ -28,7 +36,6 @@ let account = new Proxy(accountValues, {
     }
 });
 
-// 이벤트 리스너 설정
 function addEventListener() {
     document.removeEventListener('keydown', handleKeyPress);
     document.addEventListener('keydown', handleKeyPress);
@@ -43,12 +50,24 @@ function handleKeyPress(event) {
     }
     if (event.keyCode === KEY.ESC) {
         // gameOver();
-    } else if (event.keyCode == KEY.LEFT) {
+    } else if (event.keyCode === KEY.LEFT) {
         btn_select(1);
-    } else if (event.keyCode == KEY.DOWN) {
+    } else if (event.keyCode === KEY.DOWN) {
         btn_select(2);
-    } else if (event.keyCode == KEY.RIGHT) {
+    } else if (event.keyCode === KEY.RIGHT) {
         btn_select(3);
+    }
+}
+
+function handleScore(score, exp) {
+    account.score += score;
+    account.exp += exp;
+
+    if (account.exp >= EXP[account.level]) {
+        if (account.level < MAX_LEVEL) {
+            account.level++;
+        }
+        account.exp = 0;
     }
 }
 
@@ -61,18 +80,9 @@ function btn_select(num) {
         return;
     }
 
-    // 점수 증가
-    account.score += Math.ceil(account.timelimit);
-    account.exp += 1;
-
-    if (account.exp >= 10) {
-        if (account.level < MAX_LEVEL) {
-            account.level++;
-        }
-        account.exp = 0;
-    }
-
-    board.setTimeLimit(LEVEL[account.level]);
+    handleScore(Math.ceil(account.timelimit), 1);
+    gaugeBar.setExp(account.exp, EXP[account.level]);
+    board.setTimeLimit(TIMELIMIT[account.level]);
     board.setNewPiece();
 }
 
@@ -80,8 +90,7 @@ function btn_pause() {
     pause();
 }
 
-// 게임 리셋
-function resetGame() {
+function reset() {
     account.timelimit = 0;
     account.score = 0;
     account.exp = 0;
@@ -89,29 +98,29 @@ function resetGame() {
     board.reset();
 }
 
-// 게임 시작
 function play() {
     addEventListener();
-
     if (requestId) {
         cancelAnimationFrame(requestId);
     }
-    resetGame();
+    reset();
     animate();
 }
 
-function animate(now = 0) {
-    // 제한 시간
-    account.timelimit = ((board.getTimeLimit() - Math.floor(performance.now() - pausedTime)) / 1000).toFixed(2);
+function animate() {
+    let time = board.getTimeLimit() - Math.floor(performance.now() - pausedTime);
+    account.timelimit = (time / 1000).toFixed(2);
+    gaugeBar.setTime(time, TIMELIMIT[account.level]);
     if (account.timelimit <= 0) {
         account.timelimit = 0;
         gameOver();
         return;
     }
   
-    // 보드 상태 초기화
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     board.draw();
+    gaugeBar.drawExpBar();
+    gaugeBar.drawTimeBar();
     requestId = requestAnimationFrame(animate);
 }
 

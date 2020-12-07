@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>테스트6</title>
+<title>6</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <link rel="stylesheet" type="text/css" href="index.css" />
@@ -8,31 +8,34 @@
 <body>
 <div class="grid">
     <div class="left-column">
-        <canvas id="board" class="game-board"></canvas>
-        <div class="btn-group">
-            <button id="btn_paint" onclick="btn_paint(1)" class="button">Red</button><!--
-            --><button id="btn_paint" onclick="btn_paint(2)" class="button">Blue</button><!--
-            --><button id="btn_paint" onclick="btn_paint(3)" class="button">Yellow</button>
+        <div class="game-board"><canvas id="board"></canvas></div>
+        <div class="btn-group-1">
+            <button onclick="btn_paint(1)" id="btn_red" class="btn btn_left"></button><!--
+            --><button onclick="btn_paint(2)" id="btn_blue" class="btn btn_left"></button><!--
+            --><button onclick="btn_paint(3)" id="btn_yellow" class="btn btn_left"></button>
         </div>
-        <div class="btn-group">
-            <button id="btn_paint" onclick="btn_paint(4)" class="button">Green</button><!--
-            --><button id="btn_paint" onclick="btn_paint(5)" class="button">Purple</button><!--
-            --><button id="btn_paint" onclick="btn_paint(6)" class="button">Lime</button>
+        <div class="btn-group-2">
+            <button onclick="btn_paint(4)" id="btn_green" class="btn btn_left"></button><!--
+            --><button onclick="btn_paint(5)" id="btn_pink" class="btn btn_left"></button><!--
+            --><button onclick="btn_paint(6)" id="btn_orange" class="btn btn_left"></button>
         </div>
     </div>
     <div class="right-column">
-        <p id="p_title">임시 디자인</p>
-        <p id="p_next"></p>
-        <p id="p_time">Time: <span id="timelimit">0</span></p>
-        <p id="p_score">Score: <span id="score">0</span></p>
-        <button id="btn_pause" onclick="btn_pause()" class="button">Pause</button>
-        <button id="btn_submit" onclick="btn_submit()" class="button">Submit</button>
-        <button id="btn_erase" onclick="btn_paint(0)" class="button">Erase</button>
+        <div class="info info_level">LV. <span id="level">0</span></div>
+        <div class="info info_expbar"><canvas id ="canvasExp"></canvas></div>        
+        <div class="info info_next"></div>
+        <div class="info info_timelimit">Time: <span id="timelimit">0</span></div>
+        <div class="info info_timebar"><canvas id ="canvasTime"></canvas></div>
+        <div class="info info_score">Score: <span id="score">0</span></div>
+        <button onclick="btn_pause()" id="btn_pause" class="btn btn_right">Pause</button>
+        <button onclick="btn_submit()" id="btn_submit" class="btn btn_right">Submit</button>
+        <button onclick="btn_paint(0)" id="btn_erase" class="btn btn_right">Erase</button>
     </div>
 </div>
 <script type="text/javascript" src="constants.js"></script>
-<script type="text/javascript" src="board.js"></script>
 <script type="text/javascript" src="piece.js"></script>
+<script type="text/javascript" src="board.js"></script>
+<script type="text/javascript" src="gauge.js"></script>
 <script type="text/javascript" src="main.js"></script>
 </body>
 </html>

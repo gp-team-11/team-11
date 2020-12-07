@@ -1,42 +1,79 @@
 'use strict';
 
-const COLS = 6;
-const ROWS = 8;
-const ROW_SIZE = 195;
-const COL_SIZE = 120;
-const BORDER = 2;
+const MAX_LEVEL = 4;
+const MAX_TIME = 20000;
 
-const MAX_LEVEL = 5;
+const BOARD_COLS = 6;
+const BOARD_ROWS = 8;
+const BOARD_COL_SIZE = 180;
+const BOARD_ROW_SIZE = 180;
+const BOARD_CELL_PADDING = 0.05;
+const BOARD_CELL_RADIUS = 10;
+const BOARD_CELL_BG = '#000000';
+const BOARD_CELL_FASTENED_COLOR = '#ff0000';
+const BOARD_CELL_SELECTED_COLOR = '#ffffff';
+const BOARD_CELL_SELECTED_LINEWIDTH = 7;
+
+const GAUGEBAR_WIDTH = 360;
+const GAUGEBAR_HEIGHT = 36;
+const GAUGEBAR_PADDING = 5;
+const GAUGEBAR_OUTER_RADIUS = 18;
+const GAUGEBAR_INNER_RADIUS = 10;
+const GAUGEBAR_EXP_BG = '#000000';
+const GAUGEBAR_EXP_COLOR = '#4ac6ff';
+const GAUGEBAR_TIME_BG = '#000000';
+const GAUGEBAR_TIME_COLOR = '#df6464';
 
 const COLORS = [
     'none',
-    '#DF6464', // 빨
-    '#567795', // 파
-    '#C9BC46', // 노
-    '#3CB371', // 초
-    '#6B4784', // 보
-    '#A0D468', // 연
-    '#AF7960' // 갈
+    '#ff4a42',
+    '#00c6ff',
+    '#ffff00',
+    '#00e700',
+    '#f763ff',
+    '#ffa500'
 ];
 
-const SHAPES = [
-    [],
-    [[1]],
-    [[2]],
-    [[3]],
-    [[4]],
-    [[5]],
-    [[6]],
-    [[7]]
-];
-
-const LEVEL = {
-    0: 2000,
-    1: 800,
-    2: 200,
-    3: 100,
-    4: 50,
-    5: 10
+const KEY = {
+    ESC: 27,
+    SPACE: 32,
+    LEFT: 37,
+    UP: 38,
+    RIGHT: 39,
+    DOWN: 40,
+    P: 80,
+    R: 82
 };
 
-[COLORS, SHAPES, LEVEL].forEach(item => Object.freeze(item));
+const MOVES = {
+    [KEY.LEFT]: (p) => ({ ...p, col: Math.max(p.col - 1, 0) }),
+    [KEY.RIGHT]: (p) => ({ ...p, col: Math.min(p.col + 1, BOARD_COLS - 1) }),
+    [KEY.UP]: (p) => ({ ...p, row: Math.max(p.row - 1, 0) }),
+    [KEY.DOWN]: (p) => ({ ...p, row: Math.min(p.row + 1, BOARD_ROWS - 1) })
+};
+
+const COLORCOUNTS = {
+    0: 2,
+    1: 3,
+    2: 4,
+    3: 5,
+    4: 6
+}
+
+const TIMELIMIT = {
+    0: 10000,
+    1: 5000,
+    2: 3000,
+    3: 2000,
+    4: 1000
+};
+
+const EXP = {
+    0: 200,
+    1: 200,
+    2: 200,
+    3: 200,
+    4: 0
+};
+
+[COLORS, KEY, MOVES, COLORCOUNTS, TIMELIMIT, EXP].forEach(item => Object.freeze(item));

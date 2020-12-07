@@ -1,98 +1,109 @@
 class Board {
-    // 생성자
     constructor (ctx) {
         this.ctx = ctx;
-        this.ctx.canvas.width = COLS * COL_SIZE;
-        this.ctx.canvas.height = ROWS * ROW_SIZE;
+        this.ctx.canvas.width = BOARD_COLS * BOARD_COL_SIZE;
+        this.ctx.canvas.height = BOARD_ROWS * BOARD_ROW_SIZE;
         this.ctx.scale(1, 1);
     }
 
-    // 보드 초기화
     reset() {
-        this.timelimit = LEVEL[0];
+        this.timelimit = TIMELIMIT[0];
         this.currentNum = 1;
         this.inTimeNum = 1;
         this.currentGroup = 0;
-        this.grid = this.getEmptyGrid();
+        this.grid = Array.from({ length: BOARD_ROWS }, () => Array(BOARD_COLS).fill(0));;
         this.piece = new Piece(0);
         this.next = null;
+        this.selected = {
+            row: 0,
+            col: 0
+        }
 
-        var currentIndex = 0;
-        for (var i = 0; i < ROWS; i++) {
-            for (var j = 0; j < COLS; j++) {
-                this.grid[i][j] = this.piece.array[currentIndex];
-                currentIndex++;
+        for (let i = 0, c = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLS; j++, c++) {
+                this.grid[i][j] = this.piece.array[c];
             }
         }
     }
 
-    // 누적 제한 시간 반환
-    limit() {
+    getTimeLimit() {
         return this.timelimit;
     }
 
-    // 해당 칸 클릭 시 이벤트
-    click(row, col) {
-        var value = this.grid[row][col];
+    setTimeLimit(time) {
+        this.timelimit += time - account.timelimit * 1000;
+    }
 
-        // check
-        if ((value == this.currentNum)) {
-            account.score += 1;
+    select(p) {
+        this.selected.row = p.row;
+        this.selected.col = p.col;
+    }
+
+    getSelected() {
+        return this.selected;
+    }
+
+    click(p) {
+        let value = this.grid[p.row][p.col];
+
+        if ((value === this.currentNum)) {
             this.currentNum++;
-            account.exp++;
-            if (account.exp >= 10) {
-                if (account.level < MAX_LEVEL) {
-                    account.level++;
-                    time.level = LEVEL[account.level];
-                }
-                account.exp = 0;
-            }
-            this.timelimit += LEVEL[account.level];
 
-            // if first click in group
-            if (value % 12 == 1) {
+            if (value % (BOARD_ROWS * BOARD_COLS) === 1) {
                 this.currentGroup++;
                 this.next = new Piece(this.currentGroup);
             }       
-            this.grid[row][col] = this.next.array[COLS * row + col];
+            this.grid[p.row][p.col] = this.next.array[BOARD_COLS * p.row + p.col];
             return true;
         }
 
-        // game over
         return false;
     }
 
-    // 빈 보드 반환
-    getEmptyGrid() {
-        return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
-    }
-
-    // 보드를 화면에 출력
     draw() {
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
         this.grid.forEach((row, y) => {
             row.forEach((value, x) => {
                 if (value > 0) {
-                    this.ctx.fillStyle = '#FFFFFF';
-                    this.ctx.fillRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-                    this.ctx.fillStyle = '#000000';
-                    this.ctx.strokeRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-                    this.ctx.font = "100px Arial";
+                    this.ctx.fillStyle = BOARD_CELL_COLOR;
+                    this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                    this.ctx.fill();
+                    this.ctx.fillStyle = BOARD_TEXT_COLOR;
+                    this.ctx.font = BOARD_FONT_SIZE + 'px ' + BOARD_FONT_FAMILY;
                     this.ctx.textAlign = "center";
-                    this.ctx.fillText(value, x * COL_SIZE + COL_SIZE / 2, y * ROW_SIZE + ROW_SIZE / 2);
+                    this.ctx.fillText(value, x * BOARD_COL_SIZE + BOARD_COL_SIZE / 2, y * BOARD_ROW_SIZE + BOARD_ROW_SIZE / 2 + BOARD_FONT_SIZE / 3);
                 }
+            });
+        });
+        this.ctx.strokeStyle = BOARD_CELL_SELECTED_COLOR;
+        this.ctx.lineWidth = BOARD_CELL_SELECTED_LINEWIDTH;
+        this.roundedRect(this.ctx, (this.selected.col + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (this.selected.row + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+    }
+
+    black() {
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
+        this.grid.forEach((row, y) => {
+            row.forEach((value, x) => {
+                this.ctx.fillStyle = BOARD_CELL_COLOR;
+                this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                this.ctx.fill();
             });
         });
     }
 
-    // 일시정지 시 화면 가리기
-    black() {
-        this.grid.forEach((row, y) => {
-            row.forEach((value, x) => {
-                this.ctx.fillStyle = '#FFFFFF';
-                this.ctx.fillRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-                this.ctx.fillStyle = '#000000';
-                this.ctx.strokeRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-            });
-        });
+    roundedRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x, y + radius);
+        ctx.lineTo(x, y + height - radius);
+        ctx.arcTo(x, y + height, x + radius, y + height, radius);
+        ctx.lineTo(x + width - radius, y + height);
+        ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
+        ctx.lineTo(x + width, y + radius);
+        ctx.arcTo(x + width, y, x + width - radius, y, radius);
+        ctx.lineTo(x + radius, y);
+        ctx.arcTo(x, y, x, y + radius, radius);
+        ctx.stroke();
     }
 }

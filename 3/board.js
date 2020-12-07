@@ -1,113 +1,79 @@
 class Board {
-    // 생성자
     constructor (ctx) {
         this.ctx = ctx;
-        this.ctx.canvas.width = COLS * COL_SIZE;
-        this.ctx.canvas.height = ROWS * ROW_SIZE;
+        this.ctx.canvas.width = BOARD_COLS * BOARD_COL_SIZE;
+        this.ctx.canvas.height = BOARD_ROWS * BOARD_ROW_SIZE;
         this.ctx.scale(1, 1);
     }
 
-    // 보드 초기화
     reset() {
-        this.grid = this.getEmptyGrid();
-        this.tmpgrid = this.grid.slice();
-        this.piece = new Piece(2);
+        this.timelimit = DROPCYCLE[0];
+        this.grid = Array.from({ length: BOARD_ROWS }, () => Array(BOARD_COLS).fill(0));
+        this.tmpgrid = Array.from({ length: BOARD_ROWS }, () => Array(BOARD_COLS).fill(0));
+        this.piece = new Piece(COLORCOUNTS[0]);
+        this.selected = {
+            row: 0,
+            col: 0
+        }
     }
 
-    // 빈 보드 반환
-    getEmptyGrid() {
-        return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+    getTimeLimit() {
+        return this.timelimit;
     }
 
-    // 보드를 화면에 출력
-    draw() {
-        this.grid.forEach((row, y) => {
-            row.forEach((value, x) => {
-                if (value > 0) {
-                    this.ctx.fillStyle = COLORS[value];
-                    this.ctx.fillRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-                }
-            });
-        });
-        
-        // 대기줄
-        this.ctx.moveTo(0, (ROWS - 1) * ROW_SIZE);
-        this.ctx.lineTo(COLS * COL_SIZE, (ROWS - 1) * ROW_SIZE);
-        this.ctx.stroke();
+    setTimeLimit(time) {
+        this.timelimit += time - account.timelimit;
     }
 
-    // 클릭
-    click(row, col) {
-        // 맨 아랫줄
-        if (row == ROWS - 1) {
+    select(p) {
+        this.selected.row = p.row;
+        this.selected.col = p.col;
+    }
+
+    getSelected() {
+        return this.selected;
+    }
+
+    click(p) {
+        if (p.row === BOARD_ROWS - 1) {
             return false;
         }
-        var n = this.deletableBlocks(row, col);
+        let n = this.deletableBlocks(p.row, p.col);
         if (n > 0) {
-            // 임시 배열을 사용
             this.grid = JSON.parse(JSON.stringify(this.tmpgrid));
-
-            // 블록 아래로 내리기
-            this.clear();
-
-            // 점수 증가
-            account.score += n;
-            account.exp += 1;
-
-            // 일정 조건 만족하면 다음 레벨로 상승
-            if (account.exp >= 10) {
-                // 다음 레벨로 상승
-                if (account.level < MAX_LEVEL) {
-                    account.level++;
+            for (let i = 0; i < BOARD_COLS; i++) {
+                for (let j = BOARD_ROWS - 1; j > 0; j--) {
+                    if (this.grid[j][i] === 0) {
+                        for (let k = j - 1; k >= 0; k--) {
+                            if (this.grid[k][i] > 0) {
+                                this.grid[j][i] = this.grid[k][i];
+                                this.grid[k][i] = 0;
+                                break;
+                            }
+                        }
+                    }
                 }
-                account.exp = 0;
-        
-                // 블럭이 내려오는 속도 증가
-                time.level = LEVEL[account.level];
-            }            
-            return true;
+            }         
+            return n;
         };
-        return false;
+        return 0;
     }
 
-    // 빈 칸 아래로 내리기
-    clear() {
-        for (var i = 0; i < COLS; i++) {
-            while(!this.isCleared(i)) {
-
-            }
-        }
-    }
-
-    // 라인이 정리됐는지 여부 // 정리되지 않았으면 정리함
-    isCleared(col) {
-        for (var i = 0; i < ROWS - 1; i++) {
-            if (this.grid[i][col] != 0 && this.grid[i + 1][col] == 0) {
-                this.grid[i + 1][col] = this.grid[i][col];
-                this.grid[i][col] = 0;
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // 해당 블록이 3개 이상 이어져 있는지
     deletableBlocks(row, col) {
         this.tmpgrid = JSON.parse(JSON.stringify(this.grid));
-        var color = this.grid[row][col];
-        var num = this.toZero(row, col, color) + this.validBlocks(row, col, 0, color);
+        let color = this.grid[row][col];
+        let num = this.toZero(row, col, color) + this.validBlocks(row, col, 0, color);
         if (num < 3) {
             return 0;
         }
         return num;
     }
 
-    // 특정 칸에서 이어져 있는 블록 개수
     validBlocks(row, col, num, color) {
         if (color == 0) {
             return 0;
         }
-        var s = num;
+        let s = num;
 
         if (this.toZero(row - 1, col, color) > 0)  {
             s = this.validBlocks(row - 1, col, s + 1, color); 
@@ -124,51 +90,76 @@ class Board {
         return s;
     }
 
-    // 임시 배열에서 0으로 바꿀 수 있으면 1을 반환
     toZero(row, col, color) {
-        if (row < 0 || row >= ROWS - 1 || col < 0 || col >= COLS) {
+        if (row < 0 || row >= BOARD_ROWS - 1 || col < 0 || col >= BOARD_COLS) {
             return 0;
         }
-        if (this.tmpgrid[row][col] == color) {
+        if (this.tmpgrid[row][col] === color) {
             this.tmpgrid[row][col] = 0;
             return 1;
         } 
         return 0;
     }
 
-    // 블록 드롭 (위로 올리기)
-    drop() {
-        // 모든 블록을 1칸 내리고 게임 오버 판정
-        if (!this.up()) {
-            // 게임 오버
-            return false;
-        }
-
-        return true;
-    }
-    
-    // 모든 블록 1칸 올리기
     up() {
-        // 맨 윗줄에 하나라도 채워져 있으면 게임 오버       
-        for (var i = 0; i < COLS; i++) {
+        for (let i = 0; i < BOARD_COLS; i++) {
             if (this.grid[0][i] > 0) {
                 return false;
             }
         }
-
-        // 중간 줄
-        for (var i = 0; i < ROWS - 1; i++) {
-            for (var j = 0; j < COLS; j++) {
+        for (let i = 0; i < BOARD_ROWS - 1; i++) {
+            for (let j = 0; j < BOARD_COLS; j++) {
                 this.grid[i][j] = this.grid[i + 1][j];
             }
         }
-
-        // 맨 아랫줄에 새 블록 채우기
         this.next = new Piece(2 + account.level);
-        for (var i = 0; i < COLS; i++) {
-            this.grid[ROWS - 1][i] = this.next.block[i];
+        for (let i = 0; i < BOARD_COLS; i++) {
+            this.grid[BOARD_ROWS - 1][i] = this.next.value[i];
         } 
-
         return true;
+    }
+
+    draw() {
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
+        this.grid.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value > 0) {
+                    this.ctx.fillStyle = COLORS[value];
+                } else {
+                    this.ctx.fillStyle = BOARD_CELL_BG;
+                }
+                this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                this.ctx.fill();
+            });
+        });
+        this.ctx.lineWidth = BOARD_CELL_SELECTED_LINEWIDTH;
+        this.ctx.strokeStyle = BOARD_CELL_SELECTED_COLOR;
+        this.roundedRect(this.ctx, (this.selected.col + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (this.selected.row + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+
+        this.ctx.lineWidth = BOARD_BOTTOM_LINE_WIDTH;
+        this.ctx.strokeStyle = BOARD_BOTTOM_LINE;
+        this.line(ctx, 0, (BOARD_ROWS - 1) * BOARD_ROW_SIZE, BOARD_COLS * BOARD_COL_SIZE, (BOARD_ROWS - 1) * BOARD_ROW_SIZE);
+    }
+
+    line (ctx, x1, y1, x2, y2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+    }
+
+    roundedRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x, y + radius);
+        ctx.lineTo(x, y + height - radius);
+        ctx.arcTo(x, y + height, x + radius, y + height, radius);
+        ctx.lineTo(x + width - radius, y + height);
+        ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
+        ctx.lineTo(x + width, y + radius);
+        ctx.arcTo(x + width, y, x + width - radius, y, radius);
+        ctx.lineTo(x + radius, y);
+        ctx.arcTo(x, y, x, y + radius, radius);
+        ctx.stroke();
     }
 }

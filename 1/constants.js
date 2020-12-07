@@ -1,47 +1,66 @@
 'use strict';
 
-const COLS = 3;
-const ROWS = 13;
-const ROW_SIZE = 60;
-const COL_SIZE = 120;
 const MAX_LEVEL = 4;
+
+const BOARD_COLS = 3;
+const BOARD_ROWS = 13;
+const BOARD_COL_SIZE = 360;
+const BOARD_ROW_SIZE = 180;
+const BOARD_CELL_PADDING = 0.05;
+const BOARD_CELL_RADIUS = 10;
+const BOARD_CELL_BG = '#000000';
+const BOARD_CELL_SELECTED_COLOR = '#ffffff';
+const BOARD_CELL_SELECTED_LINEWIDTH = 10;
+
+const GAUGEBAR_WIDTH = 360;
+const GAUGEBAR_HEIGHT = 36;
+const GAUGEBAR_PADDING = 5;
+const GAUGEBAR_OUTER_RADIUS = 18;
+const GAUGEBAR_INNER_RADIUS = 10;
+const GAUGEBAR_EXP_BG = '#000000';
+const GAUGEBAR_EXP_COLOR = '#4ac6ff';
 
 const COLORS = [
     'none',
-    '#DF6464', // 빨
-    '#567795', // 파
-    '#C9BC46', // 노
-    '#3CB371', // 초
-    '#6B4784', // 보
-    '#A0D468' // 연
+    '#ff4a42',
+    '#00c6ff',
+    '#ffff00',
+    '#00e700',
+    '#f763ff',
+    '#ffa500'
 ];
 
 const KEY = {
     ESC: 27,
     SPACE: 32,
     LEFT: 37,
-    //UP: 38,
     RIGHT: 39,
     DOWN: 40,
     P: 80
 };
 
-const SHAPES = [
-    [],
-    [[1]],
-    [[2]],
-    [[3]],
-    [[4]],
-    [[5]],
-    [[6]]
-];
+const COLORCOUNTS = {
+    0: 2,
+    1: 3,
+    2: 4,
+    3: 5,
+    4: 6
+}
 
-const LEVEL = {
-    0: 3000,
-    1: 2500,
-    2: 2000,
-    3: 1500,
-    4: 1000
+const DROPCYCLE = {
+    0: 5000,
+    1: 4300,
+    2: 3500,
+    3: 2400,
+    4: 1500
 };
 
-[COLORS, KEY, SHAPES, LEVEL].forEach(item => Object.freeze(item));
+const EXP = {
+    0: 30,
+    1: 50,
+    2: 70,
+    3: 100,
+    4: 0
+};
+
+[COLORS, KEY, COLORCOUNTS, DROPCYCLE, EXP].forEach(item => Object.freeze(item));

@@ -1,7 +1,6 @@
 class Piece {
     constructor(colors) {
-        this.typeId = this.randomizeColor(Math.min(colors, COLORS.length - 1));
-        this.color = COLORS[this.typeId];
+        this.value = this.randomizeColor(Math.min(colors, COLORS.length - 1));
     }
 
     randomizeColor(numberOfColors) {

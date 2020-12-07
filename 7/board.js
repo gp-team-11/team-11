@@ -1,32 +1,31 @@
 class Board {
     constructor (ctx) {
         this.ctx = ctx;
-        this.ctx.canvas.width = COLS * COL_SIZE;
-        this.ctx.canvas.height = ROWS * ROW_SIZE;
+        this.ctx.canvas.width = BOARD_COLS * BOARD_COL_SIZE;
+        this.ctx.canvas.height = BOARD_ROWS * BOARD_ROW_SIZE;
         this.ctx.scale(1, 1);
     }
 
     reset() {
-        this.timelimit = LEVEL[0];
-        this.grid = this.getEmptyGrid();
+        this.timelimit = TIMELIMIT[0];
+        this.grid = Array.from({ length: BOARD_ROWS }, () => Array(BOARD_COLS).fill(null));
         this.piece = new Piece(NUMS[0], RANGES[0]);
-        for (var i = 0, c = 0; i < ROWS; i++) {
-            for (var j = 0; j < COLS; j++, c++) {
+        for (let i = 0, c = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLS; j++, c++) {
                 this.grid[i][j] = this.piece.array[c];
             }
         }
     }
 
     setNewPiece() {
-        this.piece = new Piece(NUMS[account.level], RANGES[account.level]); // 레벨에 맞는 조각
-        for (var i = 0, c = 0; i < ROWS; i++) {
-            for (var j = 0; j < COLS; j++, c++) {
+        this.piece = new Piece(NUMS[account.level], RANGES[account.level]);
+        for (let i = 0, c = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLS; j++, c++) {
                 this.grid[i][j] = this.piece.array[c];
             }
         }
     }
 
-    // 제한 시간
     getTimeLimit() {
         return this.timelimit;
     }
@@ -35,43 +34,55 @@ class Board {
         this.timelimit += time - account.timelimit * 1000;
     }
 
-    // 제출한 게 맞나 확인
     check(num) {
-        var sum = 0;
+        let sum = 0;
         this.piece.array.forEach((i) => {
             if (!isNaN(i)) {
                 sum += i;
             }
         });
         if (sum < 7) {
-            return (num == 1);
-        } else if (sum == 7) {
-            return (num == 2);
+            return (num === 1);
+        } else if (sum === 7) {
+            return (num === 2);
         } else {
-            return (num == 3);
+            return (num === 3);
         }
     }
 
-    // 빈 보드 반환
-    getEmptyGrid() {
-        return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
-    }
-
-    // 보드를 화면에 출력
     draw() {
         this.grid.forEach((row, y) => {
             row.forEach((value, x) => {
                 if (value != null) {
-                    this.ctx.fillStyle = '#FFFFFF';
-                    this.ctx.fillRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-                    this.ctx.fillStyle = '#000000';
-                    this.ctx.font = "100px Arial";
+                    this.ctx.fillStyle = BOARD_CELL_COLOR;
+                    this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                    this.ctx.fill();
+
+                    this.ctx.fillStyle = BOARD_TEXT_COLOR;
+                    this.ctx.font = BOARD_FONT_SIZE + 'px ' + BOARD_FONT_FAMILY;
                     this.ctx.textAlign = "center";
-                    this.ctx.fillText(value, x * COL_SIZE + COL_SIZE / 2, y * ROW_SIZE + ROW_SIZE / 2);
+                    this.ctx.fillText(value, x * BOARD_COL_SIZE + BOARD_COL_SIZE / 2, y * BOARD_ROW_SIZE + BOARD_ROW_SIZE / 2 + BOARD_FONT_SIZE / 3);
+                } else {
+                    this.ctx.fillStyle = BOARD_CELL_BG;
+                    this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                    this.ctx.fill();                  
                 }
-                this.ctx.strokeStyle = '#000000';
-                this.ctx.lineWidth = 1;
-                this.ctx.strokeRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
+            });
+        });
+    }
+
+    black() {
+        this.grid.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value != null) {
+                    this.ctx.fillStyle = BOARD_CELL_COLOR;
+                    this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                    this.ctx.fill();
+                } else {
+                    this.ctx.fillStyle = BOARD_CELL_BG;
+                    this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                    this.ctx.fill();                           
+                }
             });
         });
     }
@@ -89,19 +100,4 @@ class Board {
         ctx.arcTo(x, y, x, y + radius, radius);
         ctx.stroke();
     }
-
-    black() {
-        this.grid.forEach((row, y) => {
-            row.forEach((value, x) => {
-                if (value != null) {
-                    this.ctx.fillStyle = '#FFFFFF';
-                    this.ctx.fillRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-                }
-                this.ctx.strokeStyle = '#000000';
-                this.ctx.lineWidth = 1;
-                this.ctx.strokeRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-            });
-        });
-    }
-
 }

@@ -1,14 +1,14 @@
 class Board {
     constructor (ctx) {
         this.ctx = ctx;
-        this.ctx.canvas.width = COLS * COL_SIZE;
-        this.ctx.canvas.height = ROWS * ROW_SIZE;
+        this.ctx.canvas.width = BOARD_COLS * BOARD_COL_SIZE;
+        this.ctx.canvas.height = BOARD_ROWS * BOARD_ROW_SIZE;
         this.ctx.scale(1, 1);
     }
 
     reset() {
-        this.timelimit = SHOWTIME;
-        this.grid = this.getEmptyGrid();
+        this.timelimit = SHOWTIME[0];
+        this.grid = Array.from({ length: BOARD_ROWS }, () => Array(BOARD_COLS).fill(0));
         this.piece = new Piece(BLOCKCOUNTS[0], COLORCOUNTS[0]);
         this.state = false;
         this.selected = {
@@ -16,6 +16,18 @@ class Board {
             col: 0
         }
         this.show();
+    }
+
+    setNewPiece() {
+        this.piece = new Piece(BLOCKCOUNTS[account.level], COLORCOUNTS[account.level]);
+    }
+
+    getTimeLimit() {
+        return this.timelimit;
+    }
+
+    setTimeLimit(time) {
+        this.timelimit += time - account.timelimit * 1000;
     }
 
     getState() {
@@ -31,30 +43,16 @@ class Board {
 
     show() {
         this.state = false;
-        for (var i = 0, c = 0; i < ROWS; i++) {
-            for (var j = 0; j < COLS; j++, c++) {
+        for (let i = 0, c = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLS; j++, c++) {
                 this.grid[i][j] = this.piece.array[c];
             }
         }
     }
 
-    setNewPiece() {
-        this.piece = new Piece(BLOCKCOUNTS[account.level], COLORCOUNTS[account.level]); // 레벨에 맞는 조각
-    }
-
-    // 제한 시간
-    getTimeLimit() {
-        return this.timelimit;
-    }
-
-    setTimeLimit(time) {
-        this.timelimit += time - account.timelimit * 1000;
-    }
-
-    // 제출한 게 맞나 확인
     check() {
-        for (var i = 0, c = 0; i < ROWS; i++) {
-            for (var j = 0; j < COLS; j++, c++) {
+        for (let i = 0, c = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLS; j++, c++) {
                 if (this.grid[i][j] != this.piece.array[c]) {
                     return false;
                 }
@@ -63,39 +61,72 @@ class Board {
         return true;
     }
 
-    // 버튼 누름
     paint(num) {
         if (this.state) {
             this.grid[this.selected.row][this.selected.col] = num;
         }
     }
 
-    // 빈 보드 반환
-    getEmptyGrid() {
-        return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
-    }
-
-    // 보드를 화면에 출력
-    draw() {
-        this.grid.forEach((row, y) => {
-            row.forEach((value, x) => {
-                if (value > 0) {
-                    this.ctx.fillStyle = COLORS[value];
-                    this.ctx.fillRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-                }
-                this.ctx.strokeStyle = '#000000';
-                this.ctx.lineWidth = 1;
-                this.ctx.strokeRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-            });
-        });
-        this.ctx.fillStyle = '#000000';
-        this.ctx.lineWidth = 3;
-        this.ctx.strokeRect(this.selected.col * COL_SIZE, this.selected.row * ROW_SIZE, COL_SIZE, ROW_SIZE);
-    }
-
-    // 보드에서 칸 선택
     select(row, col) {
         this.selected.row = row;
         this.selected.col = col;
+    }
+
+    getSelected() {
+        return this.selected;
+    }
+
+    move(p) {
+        this.selected.row = p.row;
+        this.selected.col = p.col;
+    }
+
+    draw() {
+        this.grid.forEach((row, y) => {
+            row.forEach((value, x) => {
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
+                if (value > 0) {
+                    this.ctx.fillStyle = COLORS[value];
+                    this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                    this.ctx.fill();
+                } else {
+                    this.ctx.fillStyle = BOARD_CELL_BG;
+                    this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                    this.ctx.fill();                           
+                }
+            });
+        });
+        this.ctx.strokeStyle = BOARD_CELL_SELECTED_COLOR;
+        this.ctx.lineWidth = BOARD_CELL_SELECTED_LINEWIDTH;
+        this.roundedRect(this.ctx, (this.selected.col + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (this.selected.row + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+    }
+
+    black() {
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
+        this.ctx.fillStyle = BOARD_CELL_BG;
+        this.grid.forEach((row, y) => {
+            row.forEach((value, x) => {
+                this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                this.ctx.fill();                           
+            });
+        });
+        this.ctx.strokeStyle = BOARD_CELL_SELECTED_COLOR;
+        this.ctx.lineWidth = BOARD_CELL_SELECTED_LINEWIDTH;
+        this.roundedRect(this.ctx, (this.selected.col + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (this.selected.row + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+    }
+
+    roundedRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x, y + radius);
+        ctx.lineTo(x, y + height - radius);
+        ctx.arcTo(x, y + height, x + radius, y + height, radius);
+        ctx.lineTo(x + width - radius, y + height);
+        ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
+        ctx.lineTo(x + width, y + radius);
+        ctx.arcTo(x + width, y, x + width - radius, y, radius);
+        ctx.lineTo(x + radius, y);
+        ctx.arcTo(x, y, x, y + radius, radius);
+        ctx.stroke();
     }
 }

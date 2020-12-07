@@ -1,11 +1,15 @@
+@font-face {
+    font-family: "MapleBold";
+    src: url("../font/Maplestory\ Bold.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+}
+
 body {
     overflow: hidden;
     margin: 0px auto;
     max-width: 960px;
-}
-
-p {
-    margin: 0px;
+    background-color: #b5b5b5;
 }
 
 .grid {
@@ -20,73 +24,147 @@ p {
 }
 
 .left-column {
-    height: 100%;
+    height: calc(100% - 40px);
+    background-color: #181010;
+    border-radius: 10px;
+    margin: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
+.right-column {
+    height: calc(100% - 70px);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-right: 20px;
+}
+
 .game-board {
-    border: solid 2px;
     width: 100%;
     height: 85%;
+    margin-top: 20px;
+    align-self: center;
 }
 
-.btn-group {
+#board {
+    width: calc(100% - 40px);
+    height: 100%;
+    align-self: center;
+}
+
+#canvasExp {
     width: 100%;
+    height: 100%;
+    align-self: center;
+}
+
+#canvasTime {
+    width: 100%;
+    height: 100%;
+    align-self: center;
+}
+
+.btn-group-1 {
+    width: calc(100% - 40px);
     height: 7.5%;
     margin-left: 2px;
+    margin-top: 20px;
+    margin-bottom: 0px;
     display: flex;
+    align-self: center;
 }
 
-#btn_paint {
-    background-color: #CCCCCC;
+.btn-group-2 {
+    width: calc(100% - 40px);
+    height: 7.5%;
+    margin-left: 2px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-self: center;
+}
+
+.btn {
+    cursor: pointer;
+    border-radius: 10px;
+    font-family: MapleBold;
+    font-size: 30px;
+}
+
+.btn_left {
+    background-color: #5a5a5a;
+    border: none;
+    color: #000000;
+    margin-left: 10px;
+    margin-right: 10px;
     flex: 1;
     height: 100%;
 }
 
-.right-column {
-    height: 100%;
-    margin-left: 2px;
-}
-
-#p_title {
-    height: 10%;
-}
-
-#p_next {
-    height: 25%;
-}
-
-#p_time {
-    height: 10%;
-}
-
-#p_score {
-    height: 10%;
-}
-
-#btn_pause {
-    background-color: #999999;
+.btn_right {
+    background-color: #ffffff;
+    border: none;
+    margin-top: 10px;
     width: 100%;
     height: 15%;
 }
 
-#btn_submit {
-    background-color: #999999;
-    width: 100%;
-    height: 15%;
+#btn_red {
+    background-color: #ff4a42;
 }
 
-#btn_erase {
-    background-color: #999999;
-    width: 100%;
-    height: 15%;
+#btn_blue {
+    background-color: #00c6ff;
 }
 
-.button {
-    margin: 0px;
-    font-size: 16px;
-    cursor: pointer;
+#btn_yellow {
+    background-color: #ffff00;
 }
 
+#btn_green {
+    background-color: #00e700;
+}
+
+#btn_pink {
+    background-color: #f763ff;
+}
+
+#btn_orange {
+    background-color: #ffa500;
+}
+
+.info {
+    margin: 0px auto;
+    font-family: MapleBold;
+    font-size: 30px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.info_level {
+    height: 10%;
+    text-align: center;
+}
+
+.info_expbar {
+    height: 4%;
+}
+
+.info_next {
+    height: 17%;
+}
+
+.info_timelimit {
+    height: 10%;
+}
+
+.info_timebar {
+    height: 4%;
+}
+
+.info_score {
+    height: 10%;
+}

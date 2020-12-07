@@ -1,11 +1,15 @@
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
+const canvasExp = document.getElementById('canvasExp');
+const ctxExp = canvasExp.getContext('2d');
 
 let board = new Board(ctx);
+let gaugeBar = new GaugeBar(ctxExp);
 let requestId = null;
-let time = null;
+let pausedTime = 0;
 
 let accountValues = {
+    timelimit: 0,
     score: 0,
     exp: 0,
     level: 0
@@ -14,7 +18,11 @@ let accountValues = {
 function updateAccount(key, value) {
     let element = document.getElementById(key);
     if (element) {
-        element.textContent = value;
+        if (key === 'level' && value === MAX_LEVEL) {
+            element.textContent = 'MAX';
+        } else {
+            element.textContent = value;
+        }
     }
 }
 
@@ -26,36 +34,11 @@ let account = new Proxy(accountValues, {
     }
 });
 
-// 이벤트 리스너 설정
 function addEventListener() {
     document.removeEventListener('keydown', handleKeyPress);
     document.addEventListener('keydown', handleKeyPress);
 }
 
-// 버튼 눌렀을 때 이벤트
-function btn_select(col) {
-    if (!requestId) {
-        return;
-    }
-    if (board.isSelected()) {
-        board.move(col);
-    } else {
-        board.select(col);
-    }
-}
-
-function btn_down() {
-    if (!requestId) {
-        return;
-    }    
-    board.down();
-}
-
-function btn_pause() {
-    pause();
-}
-
-// 키보드 이벤트
 function handleKeyPress(event) {
     if (event.keyCode === KEY.P) {
         pause();
@@ -65,54 +48,93 @@ function handleKeyPress(event) {
     }
     if (event.keyCode === KEY.ESC) {
         // gameOver();
-    }
-    if (event.keyCode == KEY.LEFT) {
+    } else if (event.keyCode === KEY.LEFT) {
         btn_select(0);
-    }
-    if (event.keyCode == KEY.DOWN) {
+    } else if (event.keyCode === KEY.DOWN) {
         btn_select(1);
-    }
-    if (event.keyCode == KEY.RIGHT) {
+    } else if (event.keyCode === KEY.RIGHT) {
         btn_select(2);
-    }
-    if (event.keyCode == KEY.SPACE) {
-        board.down();
+    } else if (event.keyCode == KEY.SPACE) {
+        btn_down();
     } 
 }
 
-// 게임 리셋
-function resetGame() {
-    account.score = 0;
-    account.level = 0;
-    board.reset();
-    time = { start: performance.now(), elapsed: 0, level: LEVEL[account.level] };
+function handleScore(score, exp) {
+    account.score += score;
+    account.exp += exp;
+
+    if (account.exp >= EXP[account.level]) {
+        if (account.level < MAX_LEVEL) {
+            account.level++;
+        }
+        account.exp = 0;
+    }
 }
 
-// 게임 시작
+function btn_select(col) {
+    if (!requestId) {
+        return;
+    }
+    if (board.isSelected()) {
+        let v = board.move(col);
+        if (v > 0) {
+            handleScore(v, v);
+            gaugeBar.setExp(account.exp, EXP[account.level]);
+        }
+    } else {
+        board.select(col);
+    }
+}
+
+function btn_down() {
+    if (!requestId) {
+        return;
+    }    
+    let v = board.down();
+    if (v > 0) {
+        handleScore(v, v);
+        gaugeBar.setExp(account.exp, EXP[account.level]);
+    }
+}
+
+function btn_pause() {
+    pause();
+}
+
+function reset() {
+    account.timelimit = 0;
+    account.score = 0;
+    account.exp = 0;
+    account.level = 0;
+    board.reset();
+}
+
 function play() {
     addEventListener();
     if (requestId) {
         cancelAnimationFrame(requestId);
     }
-    resetGame();
+    reset();
     animate();
 }
 
-// 표현
-function animate(now = 0) {
-    time.elapsed = now - time.start;
-    if (time.elapsed > time.level) {
-        time.start = now;
-        if (!board.drop()) {
+function animate() {
+    account.timelimit = board.getTimeLimit() - performance.now() + pausedTime;
+    if (account.timelimit <= 0) {
+        board.setTimeLimit(DROPCYCLE[account.level]);
+        let v = board.down();
+        if (v < 0) {
             gameOver();
             return;
+        } else {
+            handleScore(v, v);
+            gaugeBar.setExp(account.exp, EXP[account.level]);           
         }
     }
   
-    // 보드 상태 초기화
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  
     board.draw();
+    gaugeBar.drawExpBar();
     requestId = requestAnimationFrame(animate);
 }
 
@@ -126,14 +148,9 @@ function pause() {
     cancelAnimationFrame(requestId);
     requestId = null;
 
-
     document.getElementById("btn_pause").innerHTML = "Continue";
-    //
-    // 화면에 추가
-
 }
 
-// 게임 오버
 function gameOver() {
     cancelAnimationFrame(requestId);
     requestId = null;

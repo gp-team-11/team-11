@@ -1,225 +1,220 @@
 class Board {
-    // 생성자
     constructor (ctx) {
         this.ctx = ctx;
-        this.ctx.canvas.width = COLS * COL_SIZE;
-        this.ctx.canvas.height = ROWS * ROW_SIZE;
+        this.ctx.canvas.width = BOARD_COLS * BOARD_COL_SIZE;
+        this.ctx.canvas.height = BOARD_ROWS * BOARD_ROW_SIZE;
         this.ctx.scale(1, 1);
     }
 
-    // 보드 초기화
     reset() {
-        this.timelimit = 10000;
-        this.grid = this.getEmptyGrid();
-        this.tmpgrid = this.getEmptyGrid();
+        this.timelimit = MAX_TIME;
+        this.grid = Array.from({ length: BOARD_ROWS }, () => Array(BOARD_COLS).fill(0));
+        this.tmpgrid = Array.from({ length: BOARD_ROWS }, () => Array(BOARD_COLS).fill(0));
+        this.piece = null;
         this.selected = {
-            row: -1,
-            col: -1
-        }        
-        this.resetBoard();
+            row: 0,
+            col: 0
+        }
+        this.fastened = false;
+        this.refill();
     }
 
-    // 판만 초기화
-    resetBoard() {
-        // 가득 채우기
-        for (var row in this.grid) {
-            for (var col in this.grid[row]) {
-                this.piece = new Piece(2);
-                this.grid[row][col] = this.piece.typeId;
+    refill() {
+        for (let row in this.grid) {
+            for (let col in this.grid[row]) {
+                this.piece = new Piece(COLORCOUNTS[account.level]);
+                this.grid[row][col] = this.piece.value;
             }
         }
 
-        // clear
-        // 리셋으로 인한 클리어 시 점수 증가 억제하도록 클리어에 파라미터 추가
-        while (this.clear(false)) {
-
-        }
+        while (this.clear() > 0) { }
     }
 
-    // 누적 제한 시간 반환
-    limit() {
+    getTimeLimit() {
         return this.timelimit;
     }
 
-    // 해당 칸 클릭 시 이벤트
-    click(row, col) {
-        var value = this.grid[row][col];
-        var rd = row - this.selected.row;
-        var cd = col - this.selected.col;
-        if (this.isSelected()) {
-            // 체크
-            // 똑같은 곳 클릭하면 해제
-            if (rd == 0 && cd == 0) {
-                this.unselect();
-            } else if ((rd == 0 && (cd == -1 || cd == 1)) || (cd == 0 && (rd == -1 || rd == 1))) {
-                var tmp = this.grid[row][col];
-                this.grid[row][col] = this.grid[this.selected.row][this.selected.col];
-                this.grid[this.selected.row][this.selected.col] = tmp;
-
-                // 클리어 되면 바로 클리어
-                if (this.clear(true)) {
-                    while (this.clear(true)) {
-
-                    }
-                    this.unselect();
-                } else {
-                    // 클리어되지 않으면 다시 원위치
-                    this.grid[this.selected.row][this.selected.col] = this.grid[row][col];
-                    this.grid[row][col] = tmp;
-                    // 그리고 그냥 선택
-                    this.select(row, col);
-                }
-            } else {
-                this.select(row, col);
-            }
-            // 바로 옆 클릭하면 옮기고 해제
-        } else {
-            this.select(row, col);
-        }
-
+    setTimeLimit(time) {
+        this.timelimit += time - account.timelimit * 1000;
     }
 
-    // 빈 보드 반환
-    getEmptyGrid() {
-        return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+    fasten() {
+        this.fastened = true;
     }
 
-    // 보드를 화면에 출력
-    draw() {
-        this.grid.forEach((row, y) => {
-            row.forEach((value, x) => {
-                this.ctx.fillStyle = COLORS[value];
-                this.ctx.fillRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-            });
-        });
-        if (this.isSelected()) {
-            this.ctx.fillStyle = '#000000';
-            this.ctx.strokeRect(this.selected.col * COL_SIZE, this.selected.row * ROW_SIZE, COL_SIZE, ROW_SIZE);
-        }
-    }
-
-    // 일시정지 시 화면 가리기
-    black() {
-        this.grid.forEach((row, y) => {
-            row.forEach((value, x) => {
-                this.ctx.fillStyle = '#FFFFFF';
-                this.ctx.fillRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-                this.ctx.fillStyle = '#000000';
-                this.ctx.strokeRect(x * COL_SIZE, y * ROW_SIZE, COL_SIZE, ROW_SIZE);
-            });
-        });
-    }
-
-    // 선택
     select(row, col) {
         this.selected.row = row;
         this.selected.col = col;
     }
 
-    // 선택 해제
-    unselect() {
-        this.selected.row = -1;
-        this.selected.col = -1;
+    getSelected() {
+        return this.selected;
     }
 
-    // 블록이 선택되었는지
-    isSelected() {
-        return this.selected.row >= 0 && this.selected.col >= 0;
+    keyboardMove(row, col) {
+        return this.click(row, col);
     }
-    
-    // 조건에 맞는 블럭 지우기
-    clear(isNormal) {
-        var b = false;
-        this.tmpgrid = JSON.parse(JSON.stringify(this.grid));
-        this.grid.forEach((row, y) => {
-            row.forEach((value, x) => {
-                if (this.validRow(y, x)) {
-                    b = true;
-                    this.tmpgrid[y][x] = 0;
-                    this.tmpgrid[y][x + 1] = 0;
-                    this.tmpgrid[y][x + 2] = 0;
-                }
-                if (this.validCol(y, x)) {
-                    b = true;
-                    this.tmpgrid[y][x] = 0;
-                    this.tmpgrid[y + 1][x] = 0;
-                    this.tmpgrid[y + 2][x] = 0;
-                }                
-            });
-        });
 
-        this.grid = JSON.parse(JSON.stringify(this.tmpgrid));
+    mouseMove(row, col) {
+        this.fasten();
+        return this.click(row, col);
+    }
 
-        // 채워 넣기
-        for (var i = 0; i < COLS; i++) {
-            while (!this.isCleared(i)) {
+    click(row, col) {
+        if (row === this.selected.row && col === this.selected.col) {
+            this.fastened = !this.fastened;
+            return 0;
+        } else if ((row === this.selected.row && (col === this.selected.col - 1 || col === this.selected.col + 1)) || (col === this.selected.col && (row === this.selected.row - 1 || row === this.selected.row + 1))) {
+            if (this.fastened) {
+                let tmp = this.grid[row][col];
+                this.grid[row][col] = this.grid[this.selected.row][this.selected.col];
+                this.grid[this.selected.row][this.selected.col] = tmp;
 
-            }
-
-            var j = 0;
-            while (j < ROWS && this.grid[j][i] == 0) {
-                this.piece = new Piece(2 + account.level); // + level
-                this.grid[j][i] = this.piece.typeId;
-                j++;
-
-                // 리셋이 아닌 일반 경우
-                if (isNormal) {
-                    // 새로 채워진 블록의 개수는 없어진 블록의 개수와 같음
-                    account.score++;
-                    account.exp++;
-                    // 부순 블록 수만큼 제한시간 증가
-                    this.timelimit += LEVEL[account.level];
-
-                    if (account.exp >= 30) {
-                        // 다음 레벨로 상승
-                        if (account.level < MAX_LEVEL) {
-                            account.level++;
-                        }
-                        account.exp = 0;
-            
+                let n = this.clear();
+                if (n > 0) {
+                    let v = 1;
+                    while(v > 0) {
+                        v = this.clear();
+                        n = n + v;
                     }
-                }      
+                    this.fastened = false;
+                    return n;
+                } else {
+                    this.grid[this.selected.row][this.selected.col] = this.grid[row][col];
+                    this.grid[row][col] = tmp;
+                }
             }
         }
-
-        return b;
+        this.fastened = false;
+        this.select(row, col);
+        return 0;
     }
 
-    // 라인이 정리됐는지 여부 // 정리되지 않았으면 정리함
-    isCleared(col) {
-        for (var i = 0; i < ROWS - 1; i++) {
-            if (this.grid[i][col] != 0 && this.grid[i + 1][col] == 0) {
-                this.grid[i + 1][col] = this.grid[i][col];
-                this.grid[i][col] = 0;
-                return false;
+    clear() {
+        let n = 0;
+        this.tmpgrid = JSON.parse(JSON.stringify(this.grid));
+        for (let i = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLS; j++) {
+                let value = this.grid[i][j];
+                if (i < BOARD_ROWS - 2 && this.grid[i + 1][j] === value && this.grid[i + 2][j] === value) {
+                    this.tmpgrid[i][j] = 0;
+                    this.tmpgrid[i + 1][j] = 0;
+                    this.tmpgrid[i + 2][j] = 0;
+                }
+                if (j < BOARD_COLS < 2 && this.grid[i][j + 1] === value && this.grid[i][j + 2] === value) {
+                    this.tmpgrid[i][j] = 0;
+                    this.tmpgrid[i][j + 1] = 0;
+                    this.tmpgrid[i][j + 2] = 0;
+                }
+            }
+        }
+        this.grid = JSON.parse(JSON.stringify(this.tmpgrid));
+        for (let i = 0; i < BOARD_COLS; i++) {
+            for (let j = BOARD_ROWS - 1; j > 0; j--) {
+                if (this.grid[j][i] === 0) {
+                    for (let k = j - 1; k >= 0; k--) {
+                        if (this.grid[k][i] > 0) {
+                            this.grid[j][i] = this.grid[k][i];
+                            this.grid[k][i] = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            for (let j = 0; j < BOARD_ROWS; j++) {
+                if (this.grid[j][i] > 0) {
+                    break;
+                }
+                this.piece = new Piece(COLORCOUNTS[account.level]);
+                this.grid[j][i] = this.piece.value;
+                n++;
+            }
+        }
+        return n;
+    }
+
+    check() {
+        function equals(v1, v2, v3) {
+            return (v1 === v2 && v2 === v3);
+        }
+
+        for (let i = 0; i < BOARD_ROWS; i++) {
+            for (let j = 0; j < BOARD_COLS; j++) {
+                if (j < BOARD_COLS - 1) {
+                    let v1 = this.grid[i][j];
+                    let v2 = this.grid[i][j + 1];
+                    if (i >= 2 && equals(v1, this.grid[i - 1][j + 1], this.grid[i - 2][j + 1]) ||
+                        j <= BOARD_COLS - 4 && equals(v1, this.grid[i][j + 2], this.grid[i][j + 3]) ||
+                        i <= BOARD_ROWS - 3 && equals(v1, this.grid[i + 1][j + 1], this.grid[i + 2][j + 1]) ||
+                        i >= 2 && equals(v2, this.grid[i - 1][j], this.grid[i - 2][j]) ||
+                        j >= 2 && equals(v2, this.grid[i][j - 1], this.grid[i][j - 2]) ||
+                        i <= BOARD_ROWS - 3 && equals(v2, this.grid[i + 1][j], this.grid[i + 2][j])) {
+                            return false;
+                    }
+                }
+
+                if (i < BOARD_ROWS - 1) {
+                    let v1 = this.grid[i][j];
+                    let v2 = this.grid[i + 1][j];
+                    if (j >= 2 && equals(v1, this.grid[i + 1][j - 1], this.grid[i + 1][j - 2]) ||
+                        i <= BOARD_ROWS - 4 && equals(v1, this.grid[i + 2][j], this.grid[i + 3][j]) ||
+                        j <= BOARD_COLS - 3 && equals(v1, this.grid[i + 1][j + 1], this.grid[i + 1][j + 2]) ||
+                        j >= 2 && equals(v2, this.grid[i][j - 1], this.grid[i][j - 2]) ||
+                        i >= 2 && equals(v2, this.grid[i - 1][j], this.grid[i - 2][j]) ||
+                        j <= BOARD_COLS - 3 && equals(v2, this.grid[i][j + 1], this.grid[i][j + 2])) {
+                            return false;
+                    }
+                }
             }
         }
         return true;
-    }    
-
-    // 없앨 수 있는 row인지 (grid 내 row, col)
-    validRow(row, col) {
-        if (col >= COLS - 2) {
-            return false;
-        }
-        var value = this.grid[row][col];
-        if (this.grid[row][col + 1] == value && this.grid[row][col + 2] == value) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
-    // 없앨 수 있는 col인지 (grid 내 row, col)
-    validCol(row, col) {
-        if (row >= ROWS - 2) {
-            return false;
-        }
-        var value = this.grid[row][col];
-        if (this.grid[row + 1][col] == value && this.grid[row + 2][col] == value) {
-            return true;
+    draw() {
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
+        this.grid.forEach((row, y) => {
+            row.forEach((value, x) => {
+                this.ctx.fillStyle = COLORS[value];
+                this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                this.ctx.fill();
+            });
+        });
+        if (this.fastened) {
+            this.ctx.strokeStyle = BOARD_CELL_FASTENED_COLOR;
         } else {
-            return false;
+            this.ctx.strokeStyle = BOARD_CELL_SELECTED_COLOR;
         }
-    }    
+        this.ctx.lineWidth = BOARD_CELL_SELECTED_LINEWIDTH;
+        this.roundedRect(this.ctx, (this.selected.col + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (this.selected.row + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+    }
+
+    black() {
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0)';
+        this.ctx.fillStyle = BOARD_CELL_BG;
+        this.grid.forEach((row, y) => {
+            row.forEach((value, x) => {
+                this.roundedRect(this.ctx, (x + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (y + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+                this.ctx.fill();       
+            });
+        });
+        this.ctx.strokeStyle = BOARD_CELL_SELECTED_COLOR;
+        this.ctx.lineWidth = BOARD_CELL_SELECTED_LINEWIDTH;
+        this.roundedRect(this.ctx, (this.selected.col + BOARD_CELL_PADDING) * BOARD_COL_SIZE, (this.selected.row + BOARD_CELL_PADDING) * BOARD_ROW_SIZE, BOARD_COL_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_ROW_SIZE * (1 - 2 * BOARD_CELL_PADDING), BOARD_CELL_RADIUS);
+    }
+
+    roundedRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x, y + radius);
+        ctx.lineTo(x, y + height - radius);
+        ctx.arcTo(x, y + height, x + radius, y + height, radius);
+        ctx.lineTo(x + width - radius, y + height);
+        ctx.arcTo(x + width, y + height, x + width, y + height - radius, radius);
+        ctx.lineTo(x + width, y + radius);
+        ctx.arcTo(x + width, y, x + width - radius, y, radius);
+        ctx.lineTo(x + radius, y);
+        ctx.arcTo(x, y, x, y + radius, radius);
+        ctx.stroke();
+    }
 }

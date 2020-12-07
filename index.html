@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+<title>main</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<link rel="stylesheet" type="text/css" href="index.css" />
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    let gameIds = ['#game1', '#game2', '#game3', '#game4', '#game5', '#game6', '#game7'];
+    let gameInfos = ['#game1-info', '#game2-info', '#game3-info', '#game4-info', '#game5-info', '#game6-info', '#game7-info'];
+    let gamePlays = ['#game1-play', '#game2-play', '#game3-play', '#game4-play', '#game5-play', '#game6-play', '#game7-play'];
+    let gameNumbers = [1, 2, 3, 4, 5, 6, 7];
+    $(document).ready(function() {
+        gameIds.forEach((id, index) => {
+            $(id).click(function() { $(gameInfos[index]).fadeIn(); });    
+        });
+        $('.game-info-exit').click(function() {
+            gameInfos.forEach((id) => { $(id).fadeOut(); })
+        });
+        gamePlays.forEach((id, index) => {
+            $(id).click(function() { $(location).attr('href', gameNumbers[index] + '/index.html'); });
+        });
+    });
+</script>
+</head>
+<body>
+    <!-- popups -->
+    <div id="game1-info">
+        <div class="game-info-content">
+            <div>
+                <p><img src="images/1.png"></p>
+                <p id="game-info-title">엄마의 삼단정리</p>
+                <p>같은 색의 블록을 세로로 3개 쌓아서 없애는 게임입니다.</p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>블록 선택 : 좌측 3개 버튼 or ←↓→ 방향키</p>
+                <p>전체 1줄 내리기 : 우측 Down 버튼 or 스페이스 바</p>
+                <p><br></p>
+                <p>
+                    <button id="game1-play">플레이</button>
+                    <button class="game-info-exit">닫기</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div id="game2-info">
+        <div class="game-info-content">
+            <div>
+                <p><img src="images/2.png"></p>
+                <p id="game-info-title">막내의 하나둘셋</p>
+                <p>제한 시간 안에 숫자를 순서대로 클릭하는 게임입니다.</p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>칸 선택 : 마우스로 클릭</p>
+                <p>or 방향키로 이동 후 스페이스 바</p>
+                <p><br></p>
+                <p>
+                    <button id="game2-play">플레이</button>
+                    <button class="game-info-exit">닫기</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div id="game3-info">
+        <div class="game-info-content">
+            <div>
+                <p><img src="images/3.png"></p>
+                <p id="game-info-title">할매의 뽁뽁뽁뽁</p>
+                <p>같은 색이 3개 이상 이어져 있는 블록을 눌러 터뜨리는 게임입니다.</p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>칸 선택 : 마우스로 클릭</p>
+                <p>or 방향키로 이동 후 스페이스 바</p>
+                <p><br></p>
+                <p>
+                    <button id="game3-play">플레이</button>
+                    <button class="game-info-exit">닫기</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div id="game4-info">
+        <div class="game-info-content">
+            <div>
+                <p><img src="images/4.png"></p>
+                <p id="game-info-title">아빠의 키맞추기</p>
+                <p>블록 위의 하얀 선을 3개 이상 맞춰 없애는 게임입니다.</p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>블록 이동 : 좌측 3개 버튼 or ←↓→ 방향키</p>
+                <p>한 번에 내리기 : 오른쪽 Down 버튼 or 스페이스 바</p>
+                <p><br></p>
+                <p>
+                    <button id="game4-play">플레이</button>
+                    <button class="game-info-exit">닫기</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div id="game5-info">
+        <div class="game-info-content">
+            <div>
+                <p><img src="images/5.png"></p>
+                <p id="game-info-title">작은형의 넘버쓰리</p>
+                <p>같은 색의 블록이 가로 또는 세로로 3개 이상 이어지도록 하여 없애는 게임입니다.</p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>블록 선택 : 마우스로 클릭 또는 방향키로 이동 후 스페이스 바</p>
+                <p>바꾸기 : 선택 상태에서 인접 블록 선택 또는 방향키 선택</p>
+                <p><br></p>
+                <p>
+                    <button id="game5-play">플레이</button>
+                    <button class="game-info-exit">닫기</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div id="game6-info">
+        <div class="game-info-content">
+            <div>
+                <p><img src="images/6.png"></p>
+                <p id="game-info-title">할배의 기억강화</p>
+                <p>블록의 위치를 기억했다가 맞는 위치에 채워넣는 게임입니다.</p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>칸 선택 : 마우스로 클릭 또는 방향키로 이동</p>
+                <p>칸 채우기 : 좌측 6개 버튼 선택 또는 qwe asd 키</p>
+                <p>칸 지우기 : 우측 Erase 버튼 또는 r키</p>
+                <p><br></p>
+                <p>
+                    <button id="game6-play">플레이</button>
+                    <button class="game-info-exit">닫기</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div id="game7-info">
+        <div class="game-info-content">
+            <div>
+                <p><img src="images/7.png"></p>
+                <p id="game-info-title">누나의 과외수업</p>
+                <p>제한 시간 안에 주어진 숫자들의 합을 계산하여 7과 비교하는 게임입니다.</p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>선택 : 좌측 3개 버튼 or ←↓→ 방향키</p>
+                <p><br></p>
+                <p>
+                    <button id="game7-play">플레이</button>
+                    <button class="game-info-exit">닫기</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- main -->
+    <div id="page">
+        <header>
+            <div class="wrapper">
+                <div id="header-title">TEAM 11</div>
+                <div id="header-menu">
+                    <nav>
+                        <ul>
+                            <li><a href="#">HOME</a></li>
+                            <li><a href="#section-games">GAMES</a></li>
+                            <li><a href="#section-about">ABOUT</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
+        <section id="section-home">
+            <div class="wrapper">
+                <div id="home-title">TEAM 11</div>
+                <div id="home-text">
+                    <p>웹페이지 접속만으로 추억의 게임들을 간편하게</p>
+                    <p id="title-image"><img src="images/title.png"></p>
+                    <p>이제는 사라진 액션퍼즐 패밀리 게임 시리즈들을 간편하게 플레이할 수 있습니다.</p>
+                    <p>컴퓨터, 모바일 모두 플레이 가능합니다!</p>
+                    <p id="home-subtitle">FEATURES</p>
+                    <p>간편합니다!</p>
+                    <p>별도의 앱이나 프로그램 설치 없이 웹페이지 접속만으로 이용하실 수 있습니다.</p>
+                    <p><br></p>
+                    <p>무료입니다!</p>
+                    <p>회원 가입이 필요 없으며, 페이지 내에 삽입되는 광고도 없습니다.</p>
+                    <p><br></p>
+                    <p>안전합니다!</p>
+                    <p>모든 게임은 소스가 공개되어 있으며, 다른 프로그램은 실행되지 않습니다.</p>
+                </div>
+            </div>
+        </section>
+        <section id="section-games">
+            <div class="wrapper">
+                <div id="games-title">GAMES</div>
+                <div id="game-list">
+                    <div id="game1" class="game"><img src="images/1.png"></div>
+                    <div id="game2" class="game"><img src="images/2.png"></div>
+                    <div id="game3" class="game"><img src="images/3.png"></div>
+                    <div id="game4" class="game"><img src="images/4.png"></div>
+                    <div id="game5" class="game"><img src="images/5.png"></div>
+                    <div id="game6" class="game"><img src="images/6.png"></div>
+                    <div id="game7" class="game"><img src="images/7.png"></div>
+                </div>
+            </div>
+        </section>
+        <section id="section-about">
+            <div class="wrapper">
+                <div id="about-title">ABOUT</div>
+                <div id="about-text">
+                    <p>액션퍼즐 패밀리는 2007년 컴투스에서 제작된 모바일 게임입니다.</p>
+                    <p>현재까지 다양한 시리즈가 제작되었고 스마트폰 앱으로도 출시되었지만 서비스 종료되었습니다.</p>
+                    <p>하지만 괜찮습니다! 이 사이트에서 다시 즐길 수 있습니다!</p>
+                    <p><br></p>
+                    <p>현재는 액션퍼즐패밀리 초기 버전의 게임들만 있습니다.</p>
+                    <p>다른 게임들은 순차적으로 추가할 예정입니다.</p>
+                    <p><br></p>
+                    <p>1. 엄마의 삼단정리</p>
+                    <p>2. 막내의 하나둘셋</p>
+                    <p>3. 할매의 뽁뽁뽁뽁</p>
+                    <p>4. 아빠의 키맞추기</p>
+                    <p>5. 작은형의 넘버쓰리</p>
+                    <p>6. 할배의 기억강화</p>
+                    <p>7. 누나의 과외수업</p>
+                    <p>8. 나의 던져쌓기 (추가 예정)</p>
+                    <p>9. 큰형의 영어공부 (추가 예정)</p>
+                    <p>10. 여동생의 그림놀이 (추가 예정)</p>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="wrapper">
+                <div id="bottom-text">
+                    <p>GitHub : https://github.com/gp-team-11/team-11</p>
+                    <p>Font : 메이플스토리 서체 (https://maplestory.nexon.com/Media/Font)</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
