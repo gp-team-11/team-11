@@ -12,6 +12,11 @@
     let gamePlays = ['#game1-play', '#game2-play', '#game3-play', '#game4-play', '#game5-play', '#game6-play', '#game7-play'];
     let gameNumbers = [1, 2, 3, 4, 5, 6, 7];
     $(document).ready(function() {
+        $('#header-nav').find('a').click(function() { 
+            if (window.matchMedia('(max-width: 720px)').matches) {
+                $('#header-nav').stop().slideUp(500);
+            }
+        });
         gameIds.forEach((id, index) => {
             $(id).click(function() { $(gameInfos[index]).fadeIn(); });    
         });
@@ -19,136 +24,238 @@
             gameInfos.forEach((id) => { $(id).fadeOut(); })
         });
         gamePlays.forEach((id, index) => {
-            $(id).click(function() { $(location).attr('href', gameNumbers[index] + '/index.html'); });
+            $(id).click(function() { $(location).attr('href', gameNumbers[index] + '/'); });
+        });
+        $('#header-button').click(function() { $('#header-nav').stop().slideToggle(500) });
+        $(window).resize(function() {
+            if (!window.matchMedia('(max-width: 720px)').matches) {
+                $('#header-nav').stop().fadeIn();
+            }
         });
     });
 </script>
 </head>
 <body>
     <!-- popups -->
-    <div id="game1-info">
+    <div id="game1-info" class="game-info">
         <div class="game-info-content">
             <div>
                 <p><img src="images/1.png"></p>
                 <p id="game-info-title">엄마의 삼단정리</p>
                 <p>같은 색의 블록을 세로로 3개 쌓아서 없애는 게임입니다.</p>
                 <p><br></p>
-                <p>조작법</p>
-                <p>블록 선택 : 좌측 3개 버튼 or ←↓→ 방향키</p>
-                <p>전체 1줄 내리기 : 우측 Down 버튼 or 스페이스 바</p>
-                <p><br></p>
                 <p>
-                    <button id="game1-play">플레이</button>
+                    <button id="game1-play" class="play-button">플레이</button>
                     <button class="game-info-exit">닫기</button>
                 </p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>블록 선택 : 좌측 3개 버튼 또는 ←↓→ 방향키</p>
+                <p>전체 1줄 내리기 : 우측 Down 버튼 또는 스페이스 바</p>
+                <p><br></p>
+                <p>규칙</p>
+                <p>1. 블록 선택 시 해당 열의 맨 아래 블록이 선택됩니다. 선택된 블록은 하얀 색으로 표시됩니다.</p>
+                <p>2. 블록이 선택된 상태에서 다른 곳을 선택하면 블록이 이동되며, 같은 곳을 선택했다면 선택이 취소됩니다.</p>
+                <p>3. 일정 시간마다 모든 줄에서 블록이 하나씩 내려옵니다.</p>
+                <p>4. 같은 색의 블록이 세로로 3개 연속해서 있으면 그 블록들은 사라지고, 남은 블록들은 위에 빈 칸이 없도록 올라갑니다.</p>
+                <p>5. 레벨이 오를수록 블록의 종류가 다양해지고, 더 빨리 내려옵니다.</p>
+                <p>6. 사용자 조작으로 한 줄 내리는 것은 자동으로 블록이 내려오는 시간에 영향을 주지 않습니다.</p>
+                <p>7. 한 줄이라도 블록이 최대 칸을 초과하게 될 경우 게임 오버입니다.</p>
+                <p><br></p>
+                <p>점수 획득 방법</p>
+                <p>블록이 사라졌을 경우 사라진 블록 하나당 1점이 주어집니다.</p>
+                <p><br></p>
             </div>
         </div>
     </div>
-    <div id="game2-info">
+    <div id="game2-info" class="game-info">
         <div class="game-info-content">
             <div>
                 <p><img src="images/2.png"></p>
                 <p id="game-info-title">막내의 하나둘셋</p>
                 <p>제한 시간 안에 숫자를 순서대로 클릭하는 게임입니다.</p>
                 <p><br></p>
-                <p>조작법</p>
-                <p>칸 선택 : 마우스로 클릭</p>
-                <p>or 방향키로 이동 후 스페이스 바</p>
-                <p><br></p>
                 <p>
-                    <button id="game2-play">플레이</button>
+                    <button id="game2-play" class="play-button">플레이</button>
                     <button class="game-info-exit">닫기</button>
                 </p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>칸 이동 : ←↓→↑ 방향키 </p>
+                <p>칸 선택 : 클릭 또는 스페이스 바</p>
+                <p><br></p>
+                <p>규칙</p>
+                <p>1. 칸을 이동하거나 선택하면 해당 칸이 붉은 색으로 표시됩니다.</p>
+                <p>2. 칸을 선택하면 그 숫자는 사라지고 그 자리에 다음에 누를 숫자가 나타납니다.</p>
+                <p>3. 게임은 제한 시간 안에 1부터 오름차순으로 숫자가 적힌 칸을 눌러 진행합니다.</p>
+                <p>4. 올바른 칸을 선택했을 경우 제한 시간이 초기화됩니다.</p>
+                <p>5. 레벨이 오를수록 제한 시간이 짧아집니다.</p>
+                <p>6. 틀린 칸을 선택했거나, 시간이 초과될 경우 게임 오버입니다.</p>
+                <p>7. 일시 정지를 할 경우 화면에 숫자가 보이지 않습니다.</p>
+                <p><br></p>
+                <p>점수 획득 방법</p>
+                <p>올바른 칸을 선택했을 경우 남은 시간을 초단위로 소숫점 올림하여 점수가 주어집니다.</p>
+                <p><br></p>
             </div>
         </div>
     </div>
-    <div id="game3-info">
+    <div id="game3-info" class="game-info">
         <div class="game-info-content">
             <div>
                 <p><img src="images/3.png"></p>
                 <p id="game-info-title">할매의 뽁뽁뽁뽁</p>
                 <p>같은 색이 3개 이상 이어져 있는 블록을 눌러 터뜨리는 게임입니다.</p>
                 <p><br></p>
-                <p>조작법</p>
-                <p>칸 선택 : 마우스로 클릭</p>
-                <p>or 방향키로 이동 후 스페이스 바</p>
-                <p><br></p>
                 <p>
-                    <button id="game3-play">플레이</button>
+                    <button id="game3-play" class="play-button">플레이</button>
                     <button class="game-info-exit">닫기</button>
                 </p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>칸 이동 : ←↓→↑ 방향키</p>
+                <p>칸 선택 : 클릭 또는 x키</p>
+                <p>전체 1줄 올리기 : 우측 Up버튼 또는 z키</p>
+                <p><br></p>
+                <p>규칙</p>
+                <p>1. 칸을 이동하거나 선택하면 해당 칸이 하얀 색으로 표시됩니다.</p>
+                <p>2. 일정 시간마다 모든 줄에서 블록이 하나씩 올라옵니다.</p>
+                <p>3. 다음에 올라올 블록들은 맨 아랫줄에 하얀 선으로 구분하여 미리 보여집니다.</p>
+                <p>4. 칸을 선택했을 때 같은 색의 블록이 3개 이상 상하좌우로 이어져 있을 경우 사라집니다. 남은 블록들은 아래에 빈 칸이 없도록 내려옵니다.</p>
+                <p>5. 다음에 올라올 블록들은 선택할 수 없으며 선택 시 계산에 포함되지 않습니다.</p>
+                <p>6. 레벨이 오를수록 블록의 종류가 다양해지고, 더 빨리 올라옵니다.</p>
+                <p>7. 한 줄이라도 다음 블록이 최대 칸을 초과하게 될 경우 게임 오버입니다.</p>
+                <p><br></p>
+                <p>점수 획득 방법</p>
+                <p>블록이 사라졌을 경우 사라진 블록당 1점이 주어집니다.</p>
+                <p><br></p>           
             </div>
         </div>
     </div>
-    <div id="game4-info">
+    <div id="game4-info" class="game-info">
         <div class="game-info-content">
             <div>
                 <p><img src="images/4.png"></p>
                 <p id="game-info-title">아빠의 키맞추기</p>
-                <p>블록 위의 하얀 선을 3개 이상 맞춰 없애는 게임입니다.</p>
-                <p><br></p>
-                <p>조작법</p>
-                <p>블록 이동 : 좌측 3개 버튼 or ←↓→ 방향키</p>
-                <p>한 번에 내리기 : 오른쪽 Down 버튼 or 스페이스 바</p>
+                <p>블록의 높이를 3개 이상 맞춰 없애는 게임입니다.</p>
                 <p><br></p>
                 <p>
-                    <button id="game4-play">플레이</button>
+                    <button id="game4-play" class="play-button">플레이</button>
                     <button class="game-info-exit">닫기</button>
                 </p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>블록 이동 : 좌측 3개 버튼 또는 ←↓→ 방향키</p>
+                <p>한 번에 내리기 : 우측 Down 버튼 또는 스페이스 바</p>
+                <p><br></p>
+                <p>규칙</p>
+                <p>1. 일정 시간마다 임의의 블록이 바닥이나 아래에 다른 블록이 있을 때까지 한 칸씩 내려옵니다.</p>
+                <p>2. 각 블록은 세로 1칸~3칸 높이를 가진 개체가 2개 세로로 쌓인 형태로 존재합니다.</p>
+                <p>3. 레벨이 오를수록 블록이 내려오는 속도가 빨라집니다.</p>
+                <p>4. 블록이 내려올 순간에 더 이상 아래로 내려오지 못 할 경우, 그 블록은 고정되며 더 이상 이동할 수 없습니다.</p>
+                <p>5. 블록이 고정되었다면 다음 블록이 내려옵니다. 다음에 내려올 블록은 우측에 나타납니다.</p>
+                <p>6. 고정된 블록들 중에서 높이가 같은 곳이 3개 이상 이어져 있을 경우, 해당 블록은 사라지고 남은 블록은 아래에 빈 칸이 없도록 내려옵니다.</p>
+                <p>7. 블록이 고정될 때 최대 칸을 초과하게 될 경우 게임 오버입니다.</p>
+                <p><br></p>
+                <p>점수 획득 방법</p>
+                <p>블록이 사라졌을 경우 사라진 블록 1칸 당 1점이 주어집니다.</p>
+                <p><br></p>     
             </div>
         </div>
     </div>
-    <div id="game5-info">
+    <div id="game5-info" class="game-info">
         <div class="game-info-content">
             <div>
                 <p><img src="images/5.png"></p>
                 <p id="game-info-title">작은형의 넘버쓰리</p>
                 <p>같은 색의 블록이 가로 또는 세로로 3개 이상 이어지도록 하여 없애는 게임입니다.</p>
                 <p><br></p>
-                <p>조작법</p>
-                <p>블록 선택 : 마우스로 클릭 또는 방향키로 이동 후 스페이스 바</p>
-                <p>바꾸기 : 선택 상태에서 인접 블록 선택 또는 방향키 선택</p>
-                <p><br></p>
                 <p>
-                    <button id="game5-play">플레이</button>
+                    <button id="game5-play" class="play-button">플레이</button>
                     <button class="game-info-exit">닫기</button>
                 </p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>칸 이동 : ←↓→↑ 방향키</p>
+                <p>칸 선택 : 클릭 또는 스페이스 바</p>
+                <p>바꾸기 : 선택 상태에서 인접 블록 선택 또는 ←↓→↑ 방향키</p>
+                <p><br></p>
+                <p>규칙</p>
+                <p>1. 칸을 이동하거나 클릭으로 선택하면 해당 칸이 하얀 색으로 표시됩니다. 스페이스 바로 선택하면 붉은 색으로 표시됩니다.</p>
+                <p>2. 클릭으로 선택 상태일 경우 상하좌우로 인접한 블록을 클릭하여 바꾸기를 시도할 수 있습니다.</p>
+                <p>3. 스페이스바로 선택 상태일 경우 상하좌우로 인접한 블록을 클릭하거나 해당 방향키를 눌러 바꾸기를 시도할 수 있습니다.</p>
+                <p>4. 블록을 바꿨을 때 같은 색의 블록이 가로 또는 세로로 3개 이상 이어져 있으면 그 블록은 사라집니다.</p>
+                <p>5. 블록이 사라졌을 때 남은 블록은 빈 칸이 없도록 아래로 내려오고, 그 자리에는 새로운 블록이 채워집니다.</p>
+                <p>6. 블럭이 사라졌을 경우 제한 시간이 일정량 늘어잡니다.</p>
+                <p>7. 바꿀 블록이 없을 경우 리셋 버튼을 눌러 판을 초기화할 수 있습니다. 바꿀 수 있는 블록이 하나라도 있으면 사용할 수 없습니다.</p>
+                <p>8. 레벨이 오를수록 블록의 종류가 다양해지고, 제한 시간이 짧아집니다.</p>
+                <p>9. 제한 시간이 초과될 경우 게임 오버입니다.</p>
+                <p>10. 일시 정지를 할 경우 화면의 색이 보이지 않습니다.</p>
+                <p><br></p>
+                <p>점수 획득 방법</p>
+                <p>블록이 사라졌을 경우 사라진 블록 1칸 당 1점이 주어집니다.</p>
+                <p><br></p>     
             </div>
         </div>
     </div>
-    <div id="game6-info">
+    <div id="game6-info" class="game-info">
         <div class="game-info-content">
             <div>
                 <p><img src="images/6.png"></p>
                 <p id="game-info-title">할배의 기억강화</p>
                 <p>블록의 위치를 기억했다가 맞는 위치에 채워넣는 게임입니다.</p>
                 <p><br></p>
-                <p>조작법</p>
-                <p>칸 선택 : 마우스로 클릭 또는 방향키로 이동</p>
-                <p>칸 채우기 : 좌측 6개 버튼 선택 또는 qwe asd 키</p>
-                <p>칸 지우기 : 우측 Erase 버튼 또는 r키</p>
-                <p><br></p>
                 <p>
-                    <button id="game6-play">플레이</button>
+                    <button id="game6-play" class="play-button">플레이</button>
                     <button class="game-info-exit">닫기</button>
                 </p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>칸 선택 : 클릭 또는 ←↓→↑ 방향키</p>
+                <p>선택한 칸 채우기 : 좌측 6개 버튼 또는 qwe asd 키</p>
+                <p>선택한 칸 지우기 : 우측 Erase 버튼 또는 r키</p>
+                <p>답안 제출 : 우측 Submit 버튼 또는 스페이스 바</p>
+                <p><br></p>
+                <p>규칙</p>
+                <p>1. 칸을 선택하면 하얗게 표시되며, 채우기나 지우기를 하면 그 칸에 색깔을 칠하거나 지울 수 있습니다.</p>
+                <p>2. 게임 시작 시 일정 시간동안 임의의 칸에 임의의 색깔이 칠해진 판이 보여집니다. 이 때에는 채우거나 지울 수 없습니다.</p>
+                <p>3. 일정 시간이 지나면 판이 모두 지워지며, 제한 시간 안에 지워지기 전의 형태로 만들어야 합니다.</p>
+                <p>4. 레벨이 올라갈수록 색의 종류가 다양해지고, 색이 칠해진 칸의 수가 많아집니다.</p>
+                <p>5. 모든 칸을 채웠다면 제한 시간 안에 제출해야 클리어로 인정됩니다.</p>
+                <p>6. 제한 시간 안에 제출하지 못 하거나 틀리게 제출했을 경우 게임 오버입니다.</p>
+                <p>7. 판이 보여질 때 일시정지를 할 경우 칠해진 색이 보이지 않습니다.</p>
+                <p><br></p>
+                <p>점수 획득 방법</p>
+                <p>올바른 답안을 제출했을 경우 남은 시간을 초단위로 소숫점 올림하여 점수가 주어집니다.</p>
+                <p><br></p> 
             </div>
         </div>
     </div>
-    <div id="game7-info">
+    <div id="game7-info" class="game-info">
         <div class="game-info-content">
             <div>
                 <p><img src="images/7.png"></p>
                 <p id="game-info-title">누나의 과외수업</p>
                 <p>제한 시간 안에 주어진 숫자들의 합을 계산하여 7과 비교하는 게임입니다.</p>
                 <p><br></p>
-                <p>조작법</p>
-                <p>선택 : 좌측 3개 버튼 or ←↓→ 방향키</p>
-                <p><br></p>
                 <p>
-                    <button id="game7-play">플레이</button>
+                    <button id="game7-play" class="play-button">플레이</button>
                     <button class="game-info-exit">닫기</button>
                 </p>
+                <p><br></p>
+                <p>조작법</p>
+                <p>선택 : 좌측 3개 버튼 또는 ←↓→ 방향키</p>
+                <p><br></p>
+                <p>규칙</p>
+                <p>1. 게임 시작 시 임의의 칸에 임의의 숫자가 적힌 판이 보여집니다.</p>
+                <p>2. 제한 시간 안에 판에 적힌 숫자들의 합을 7과 비교하여 맞는 버튼을 눌러야 합니다.</p>
+                <p>3. 7보다 작으면 왼쪽, 같으면 가운데, 크면 오른쪽을 선택해야 합니다.</p>
+                <p>4. 레벨이 올라갈수록 숫자의 종류가 다양해지고, 숫자가 적힌 칸의 수가 많아집니다.</p>
+                <p>5. 틀린 답을 선택하거나 제한 시간 안에 선택하지 못 할 경우 게임 오버입니다.</p>
+                <p>6. 일시정지를 할 경우 칸에 적힌 숫자들이 보이지 않습니다.</p>
+                <p><br></p>
+                <p>점수 획득 방법</p>
+                <p>답이 맞았을 경우 남은 시간을 초단위로 소숫점 올림하여 점수가 주어집니다.</p>
+                <p><br></p> 
             </div>
         </div>
     </div>
@@ -159,11 +266,13 @@
             <div class="wrapper">
                 <div id="header-title">TEAM 11</div>
                 <div id="header-menu">
-                    <nav>
+                    <button id="header-button">≡</button>
+                    <nav id="header-nav">
                         <ul>
                             <li><a href="#">HOME</a></li>
                             <li><a href="#section-games">GAMES</a></li>
                             <li><a href="#section-about">ABOUT</a></li>
+                            <li><a href="rank.php">RANK</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -173,7 +282,8 @@
             <div class="wrapper">
                 <div id="home-title">TEAM 11</div>
                 <div id="home-text">
-                    <p>웹페이지 접속만으로 추억의 게임들을 간편하게</p>
+                    <p>웹페이지 접속만으로</p>
+                    <p>추억의 게임들을 간편하게</p>
                     <p id="title-image"><img src="images/title.png"></p>
                     <p>이제는 사라진 액션퍼즐 패밀리 게임 시리즈들을 간편하게 플레이할 수 있습니다.</p>
                     <p>컴퓨터, 모바일 모두 플레이 가능합니다!</p>

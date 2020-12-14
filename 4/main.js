@@ -8,6 +8,7 @@ const ctxExp = canvasExp.getContext('2d');
 let board = new Board(ctx, ctxNext);
 let gaugeBar = new GaugeBar(ctxExp);
 let requestId = null;
+let isGameover = false;
 let pausedTime = 0;
 
 let accountValues = {
@@ -142,6 +143,9 @@ function animate() {
 }
 
 function pause() {
+    if (isGameover) {
+        return;
+    }
     if (!requestId) {
         animate();
         document.getElementById("btn_pause").innerHTML = "Pause";
@@ -157,12 +161,30 @@ function pause() {
 function gameOver() {
     cancelAnimationFrame(requestId);
     requestId = null;
-    alert("Game Over");
+    isGameover = true;
 
-    // 스코어 저장 등 이벤트 추가
+    $('#final-score').text(account.score);
+    $('#final-score-hidden').val(account.score);
+    $('.popup_end').fadeIn();
 }
 
-// 스크립트 로드 시 바로 실행
-this.play();
+function submit() {
+    function setAttribute(name, value) {
+        let hiddenField = document.createElement("input");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", name);
+        hiddenField.setAttribute("value", value);
+        return hiddenField;
+    }
 
+    let form = document.createElement("form");
+    form.setAttribute("method", "post");
+    form.setAttribute("action", "../upload.php");
 
+    form.appendChild(setAttribute("game", "4"));
+    form.appendChild(setAttribute("name", document.getElementById("name").value));
+    form.appendChild(setAttribute("score", account.score));
+
+    document.body.appendChild(form);
+    form.submit();
+}

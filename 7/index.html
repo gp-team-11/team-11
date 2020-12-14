@@ -1,11 +1,47 @@
+<!doctype html>
 <html>
 <head>
 <title>7</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <link rel="stylesheet" type="text/css" href="index.css" />
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#btn_start').click(function() {
+            $('.popup_start').fadeOut();
+            play();
+        });
+        $('#btn_main').click(function() {
+            location.href = '../';
+        });
+    });
+</script>
 </head>
 <body>
+<div class="popup_start">
+    <div class="popup-content">
+        <div>
+            <p id="popup-title">시작하려면 아래 버튼을 눌러주세요.</p>
+            <p><br></p>
+            <p><a id="btn_start">시작하기</a></p>
+            <p><br></p>
+            <p><a id="btn_main">메인으로</a></p>
+        </div>
+    </div>
+</div>
+<div class="popup_end">
+    <div class="popup-content">
+        <div>
+            <p id="popup-title">GAME OVER</p>
+            <p><br></p>
+            <p>점수 : <span id="final-score">0</span></p>
+            <p><br></p>
+            <p><input type="text" id="name" value="no name"></p>
+            <p><a id="btn_submit" onclick=submit()>submit</a></p>
+        </div>
+    </div>
+</div>    
 <div class="grid">
     <div class="left-column">
         <div class="game-board"><canvas id="board"></canvas></div>

@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS `apf_rank` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `game` INT NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `score` INT NOT NULL,
+    `date` DATE NOT NULL,
+    primary key (`id`)
+);

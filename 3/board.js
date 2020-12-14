@@ -38,6 +38,7 @@ class Board {
         if (p.row === BOARD_ROWS - 1) {
             return false;
         }
+        this.select(p);
         let n = this.deletableBlocks(p.row, p.col);
         if (n > 0) {
             this.grid = JSON.parse(JSON.stringify(this.tmpgrid));

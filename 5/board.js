@@ -72,10 +72,12 @@ class Board {
 
                 let n = this.clear();
                 if (n > 0) {
+                    handleScore(n, n);
                     let v = 1;
                     while(v > 0) {
                         v = this.clear();
                         n = n + v;
+                        handleScore(v, v);
                     }
                     this.fastened = false;
                     return n;
