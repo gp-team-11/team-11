@@ -24,6 +24,7 @@ class Board {
                 this.grid[i][j] = this.piece.array[c];
             }
         }
+
     }
 
     getTimeLimit() {

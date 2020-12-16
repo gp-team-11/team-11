@@ -7,6 +7,7 @@ let board = new Board(ctx);
 let gaugeBar = new GaugeBar(ctxExp);
 let requestId = null;
 let isGameover = false;
+let startTime = 0;
 let pausedTime = 0;
 
 let accountValues = {
@@ -103,6 +104,7 @@ function btn_pause() {
 }
 
 function reset() {
+    startTime = performance.now();
     account.timelimit = 0;
     account.score = 0;
     account.exp = 0;
@@ -120,7 +122,7 @@ function play() {
 }
 
 function animate() {
-    account.timelimit = board.getTimeLimit() - performance.now() + pausedTime;
+    account.timelimit = board.getTimeLimit() - performance.now() + pausedTime + startTime;
     if (account.timelimit <= 0) {
         board.setTimeLimit(DROPCYCLE[account.level]);
         let v = board.down();

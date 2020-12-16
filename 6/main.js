@@ -9,6 +9,7 @@ let board = new Board(ctx);
 let gaugeBar = new GaugeBar(ctxExp, ctxTime);
 let requestId = null;
 let isGameover = false;
+let startTime = 0;
 let pausedTime = 0;
 
 let accountValues = {
@@ -117,6 +118,7 @@ function btn_paint(num) {
 }
 
 function reset() {
+    startTime = performance.now();
     account.timelimit = 0;
     account.score = 0;
     account.exp = 0;
@@ -134,7 +136,7 @@ function play() {
 }
 
 function animate() {
-    let time = board.getTimeLimit() - Math.floor(performance.now() - pausedTime);
+    let time = board.getTimeLimit() - Math.floor(performance.now() - pausedTime - startTime);
     account.timelimit = (time / 1000).toFixed(2);
     if (board.getState()) {
         gaugeBar.setTime(time, HIDETIME[account.level]);
